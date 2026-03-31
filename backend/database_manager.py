@@ -133,13 +133,13 @@ class DatabaseManager:
             cursor.execute("SELECT * FROM saved_recipes WHERE user_id = ? AND recipe_id = ?", (user_id, recipe_id))
             existing_recipe = cursor.fetchone()
             if existing_recipe:
-                logging.info(f"🔄 Toggling off recipe '{recipe_title}' for user '{username}'")
+                logging.info(f"🗑️The item '{recipe_title}' was successfully REMOVED from the database for user '{username}'")
                 cursor.execute("DELETE FROM saved_recipes WHERE user_id = ? AND recipe_id = ?",
                                (user_id, recipe_id))
                 self.connection.commit()
                 return jsonify({"message": "Recipe removed successfully!", "action": "removed"}), 200
             else:
-                logging.info(f"🔄 Toggling on recipe '{recipe_title}' for user '{username}'")
+                logging.info(f"💾 The item '{recipe_title}' was successfully ADDED to the database for user '{username}'")
                 cursor.execute(
                     "INSERT INTO saved_recipes (user_id, recipe_id, recipe_title, recipe_image ,recipe_url) VALUES (?, ?, ?, ?,?)",
                     (user_id, recipe_id, recipe_title, recipe_image, recipe_url))
