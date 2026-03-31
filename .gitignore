@@ -1,0 +1,19 @@
+# --- Virtual Environments ---
+.venv/
+venv/
+env/
+
+# --- Environment Variables (SECRETS!) ---
+.env
+
+# --- PyCharm Settings ---
+.idea/
+
+# --- Python Cache ---
+__pycache__/
+*.pyc
+
+# --- Databases ---
+# לא נהוג להעלות את הדאטה-בייס עצמו לפרויקטים, אלא לייצר קובץ ריק שמתמלא כשהאפליקציה רצה
+*.db
+backend/my_database.db

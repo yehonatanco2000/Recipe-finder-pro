@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="he" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>recommend recipes</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <h1> Find a recipe 🍳</h1>
+    <button id="open-login-homepage" style="top: 30px; left: 100px;position: absolute;background: #74a9ff;color: black">Login/Register 👤</button>
+    <input id = "search-input" type="text" placeholder="Search for a recipe...">
+    <div id="chip-container"></div>
+    <button id = "menu-button"> ☰ </button>
+    <div id = "sidebar" class="sidebar">
+        <button id = "close-sidebar">close ✖</button>
+    <h3 id="user-greeting" style="display: none; color: #4CAF50; text-align: center; margin-bottom: 20px; direction: ltr;"></h3>
+        <button id="home-btn" style="background-color: #f8f9fa; color: #333; border: 1px solid #ddd; margin-top: 10px;">Home 🏠</button>
+        <button id="favorites-list-btn" style="display: none; background-color: #f8f9fa; color: #333; border: 1px solid #ddd; margin-top: 10px;">My favorites ❤️ </button>
+        <h3 style="text-align: center">Recipes filter</h3>
+        <p style="text-align: center">Select a type:</p>
+        <select id="cuisine-select" style="display: block; margin: 0 auto; text-align: center; text-align-last: center; width: 80%; padding: 8px; border-radius: 5px;">
+            <option value="">All Cuisines</option>
+            <option value="american">American</option>
+            <option value="asian">Asian</option>
+            <option value="french">French</option>
+            <option value="indian">Indian</option>
+            <option value="italian">Italian</option>
+            <option value="mediterranean">Mediterranean</option>
+            <option value="mexican">Mexican</option>
+        </select>
+        <button id="logout-btn" class="sidebar-btn" style="display: none; background-color: none; color: black;">Logout 🚪</button>
+    </div>
+    <button id="search-button">Search</button>
+    <div id="search-message" style="color:#121212;font-size:18px; text-align:center; margin: 15px 0;"></div>
+    <div id="recommendations" style="width: 80%; margin: 20px auto; text-align: center;background-color: rgba(255, 255, 255, 0.85);display:none ;border-radius: 10px;">
+        <h2 style="color: #333; margin-bottom: 30px;">Recommended Recipes ✨:</h2>
+        <div id="recommendations-grid"></div>
+    </div>
+    <div id="results" style="color:#121212;font-size:18px;"></div>
+<!-- חלון ההתחברות (מודאל) שיופיע במרכז המסך -->
+<div id="login-modal" class="modal-overlay">
+    <div class="login-box">
+        <h2 style="color: #333; margin-bottom: 20px;">Sign in:</h2>
+        <input type="text" id="username-input" placeholder="Username">
+        <input type="password" id="password-input" placeholder="Password">
+        <button id="login-btn">Login</button>
+        <button id="register-btn" style="background-color: #2196F3;">Register</button>
+        <button id="close-modal-btn" style="background-color: #ccc; color: black; margin-top: 15px;">Cancel and return to home page.</button>
+        </div>
+</div>
+    <div id="favorites-modal" class="modal-overlay">
+        <div class="favorites-box">
+            <h2 style="color: white; margin-top: 20px;">My Favorites:</h2>
+            <button id="close-favorites-btn" style="background:none; color: black; top: 15px; right: 15px; position:absolute;width: max-content;">close ❌</button>
+            <div id="favorites-grid"></div>
+        </div>
+    </div>
+    <div id = "register-section" class ="register-section">
+            <div class="register-box">
+            <h2 style="color: #333; margin-bottom: 20px;">  New register:</h2>
+            <input type="text" id="register-username-input" placeholder="New Username">
+            <input type="password" id="register-password-input" placeholder="New Password">
+            <input type="password" id="register-confirm-password-input" placeholder="confirm Password">
+            <button id="confirm-register-btn" style="background-color: #2196F3;">Submit</button>
+            </div>
+    </div>
+    
+    <!-- 🌟 חלון התראות מעוצב במקום alert() ישן 🌟 -->
+    <div id="custom-alert-modal" class="modal-overlay">
+        <div class="custom-alert-box">
+            <p id="custom-alert-text">Message goes here</p>
+            <button id="close-alert-btn">Got it! 👍</button>
+        </div>
+    </div>
+
+    <script type="module" src="/static/js/main.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,369 @@
+
+body {
+      background-image: url('/static/images/background.png'); /* תמונת רקע */
+      /* גורם לתמונה לכסות את כל המסך ולא לחזור על עצמה */
+      background-size: cover;
+      background-position: center;
+       background-attachment: fixed;
+      background-repeat: no-repeat;
+      font-family: Arial, sans-serif; /* פונט נקי */
+      display: flex; /* הופך את הגוף לקונטיינר גמיש */
+      flex-direction: column; /* מסדר את הילדים (התוכן) בעמודה */
+      text-align: center; /* ממרכז את כל התוכן לאמצע המסך */
+      margin-top: 135px; /* מוריד את הכל קצת למטה כדי שלא יידבק לתקרה */
+      }
+
+      h1 {
+          color: white; /* צבע אפור כהה לכותרת */
+            font-size: 36px; /* גודל הכותרת */
+            margin-bottom: 20px; /* רווח מתחת לכותרת */
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1); /* מוסיף צל קל לטקסט כדי להבליט אותו על הרקע */
+            height: 20px; /* גובה קבוע לכותרת כדי למנוע שינוי גודל כשהטקסט משתנה */
+         }
+
+      input {
+            margin: 20px auto; /* מוסיף רווח מעל ומתחת וממרכז את התיבה */
+            padding: 10px; /* רווח פנימי כדי שהתיבה תהיה שמנמנה */
+            width: 300px; /* רוחב התיבה */
+            border: 2px solid #ccc; /* מסגרת אפורה */
+            border-radius: 5px; /* הנה הרדיוס שלמדנו! מעגל את הפינות */
+            font-size: 16px; /* גודל הטקסט שנקליד בפנים */
+            }
+
+      button {
+            padding: 10px 20px; /* רווח פנימי כדי שהכפתור יהיה שמנמן ונוח ללחיצה */
+            width: 200px; /* רוחב הכפתור */
+            margin: 20px auto; /* מוסיף רווח מעל ומתחת וממרכז את הכפתור */
+            background-color: #ff6b6b; /* צבע אדמדם-כתום */
+            color: white; /* טקסט לבן */
+            border: none; /* מוריד את המסגרת המכוערת שיש כברירת מחדל */
+            border-radius: 5px; /* פינות מעוגלות */
+            font-size: 16px;
+            cursor: pointer; /* הופך את סמן העכבר ליד לוחצת כשעוברים מעל */
+            }
+
+      button:hover {
+                   background-color: #ff4c4c;
+                   }
+
+      .recipe-card {
+          background-color: white;
+          position: relative;
+          border-radius: 12px;
+          padding: 15px;
+          margin: 0;
+          box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+          transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+      
+      .recipe-card:hover {
+          transform: translateY(-7px);
+          box-shadow: 0 12px 20px rgba(0,0,0,0.12);
+      }
+      
+      .recipe-card img {
+          width: 100%;
+          height: 180px;
+          object-fit: contain; /* שומר על התמונה במלואה בלי לחתוך אותה */
+          background-color: #f9f9f9; /* רקע עדין כדי למלא את החלל הריק במראה נקי */
+          border-radius: 8px;
+          margin-bottom: 12px;
+      }
+
+      #results, #recommendations-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+          gap: 25px;
+          width: 85%; 
+          margin: 30px auto;
+          align-items: start; /* מונע משאר הכרטיסיות באותה שורה להימתח כשאחת נפתחת */
+      }
+      #recommendations {
+          padding-top: 20px;
+          padding-bottom: 20px;
+      }
+      #menu-button {
+                   position: absolute; /* מוציא את הכפתור מהסדר הרגיל */
+                   top: 20px;
+                   right: 20px; /* מצמיד אותו לפינה הימנית העליונה */
+                   font-size: 30px;
+                   background: none;
+                   border: none;
+                   cursor: pointer;
+                   color: white;
+        }
+      .sidebar{
+              position: fixed; /* מקבע אותו למסך כדי שיישאר גם כשגוללים */
+              top: 0;
+              right: -300px; /* מוחבא מחוץ למסך בצד ימין! */
+              width: 250px;
+              height: 100%;
+              background-color: white;
+              box-shadow: -2px 0 10px rgba(0,0,0,0.2);
+              transition: right 0.3s ease; /* אנימציה חלקה - החלקה במקום קפיצה */
+              padding: 20px;
+              box-sizing: border-box;
+              text-align: right;
+              z-index: 1000; /* מנצח את כרטיסיות המתכונים ונשאר מעליהן! */
+            }
+      .sidebar.open {
+                    right: 0; /* כשהמחלקה 'open' מתווספת, הסר את ההסתרה והצג את הסרגל */
+                    }
+      #close-sidebar{
+                    font-size: 20px;
+                    background: none;
+                    border: none;
+                    cursor: pointer;
+                    color: #CD5C5C;
+                    margin-bottom: 20px;
+                    }
+/* --- תוספות חדשות עבור כרטיסיות נפתחות בלחיצה (אקורדיון) --- */
+      .clickable {
+                cursor: pointer; /* הופך את סמן העכבר ליד לוחצת */
+                transition: opacity 0.2s; /* אנימציה חלקה כשמרחפים */
+                }
+
+      .clickable:hover {
+                      opacity: 0.8; /* נותן אפקט ריחוף קל על התמונה והכותרת */
+                      }
+
+      #favorites-list-btn{
+                    font-size: 15px;
+                    background: none;
+                    border: none;
+                    cursor: pointer;
+                    color: black;
+                    margin-bottom: 20px;
+                    }
+      .favorites-box{
+                    background: white;
+                    position: relative; /* מאפשר למקם את כפתור הסגירה בתוך הקובייה */
+                    padding: 30px;
+                    border-radius: 15px;
+                    width: 80%;
+                    max-height: 80vh; /* מגביל את הגובה כדי למנוע מהחלון להיות ענק אם יש הרבה מתכונים */
+                    overflow-y: auto; /* מוסיף פס גלילה אנכי אם התוכן גבוה מדי*/
+                    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+                    text-align: center;
+      }
+      #favorites-grid{
+                    display: grid;
+                    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                    gap: 20px;
+      }
+      #cuisine-select {
+            text-align: center;
+            text-align-last: center; /* זה הטריק שממרכז את הטקסט בתיבה! */
+            width: 80%; /* אפשר לשחק עם הרוחב כדי שייראה טוב בתפריט */
+            margin: 0 auto; /* ממקם את התיבה עצמה באמצע */
+            display: block;
+            }
+
+      .recipe-details {
+            display: none; /* מסתיר את התוכן כברירת מחדל! */
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+            text-align: left; /* מיישר את הקלוריות והקישור לאנגלית */
+           }
+
+      .recipe-details.show {
+            display: block; /* כשנוסיף את המחלקה הזו מה-JS, התוכן יופיע */
+            }
+
+      /* --- עיצוב כפתור השמירה (לב) --- */
+.save-btn {
+    position: absolute; /* מאפשר ללב לרחף בתוך הקובייה */
+    top: 10px; /* מרחק מהלמעלה של הקובייה */
+    left: 10px; /* מרחק מצד שמאל! */
+    background: white; /* רקע עגול לבן מאחורי הלב */
+    border-radius: 50%;
+    border: none;
+    font-size: 20px; /* גודל הלב קטן יותר ממה שהיה */
+    width: 35px; /* עיגול מושלם */
+    height: 35px;
+    cursor: pointer;
+    transition: transform 0.2s, background-color 0.2s; /* אנימציה חלקה */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    z-index: 10; /* מוודא שהלב מעל התמונה תמיד וחץ העכבר לא מתבלבל */
+}
+
+.save-btn:hover {
+    background-color: #f0f0f0; /* מקבל צבע קצת אפור בריחוף כדי לדעת שלוחצים */
+    transform: scale(1.15); /* כשהעכבר עליו, הלב קצת גדל (אפקט פעימה) */
+    opacity: 1 !important; /* דורס את האטימות מהכרטיסייה */
+}
+
+/* --- עיצוב החלון הקופץ (Modal) --- */
+.modal-overlay {
+    display: none; /* החלון מוסתר בהתחלה */
+    position: fixed; /* נשאר מקובע למסך */
+    top: 0; left: 0; width: 100%; height: 100%;
+    background-color: rgba(0, 0, 0, 0.85); /* מסך שחור כמעט אטום שמסתיר את הבית */
+    z-index: 1000; /* דואג שזה יהיה מעל הכל! */
+    justify-content: center; /* ממרכז אופקית */
+    align-items: center; /* ממרכז אנכית */
+}
+
+/* כשנוסיף את המחלקה הזו מה-JS, החלון יופיע */
+.modal-overlay.show {
+    display: flex;
+}
+#open-login-sidebar{
+    font-size: 15px;
+    background: #74a9ff;
+    border: none;
+    cursor: pointer;
+    color: black;
+    margin-bottom: 20px;
+}
+
+.login-box {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    width: 320px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    text-align: center;
+}
+
+.login-box input {
+    width: 90%;
+    margin-bottom: 15px;
+    /* העיצוב שכבר הגדרת ל-input שלך יעבוד גם כאן אוטומטית! */
+}
+
+.login-box button {
+    width: 95%;
+    margin-bottom: 10px;
+}
+
+.register-section{
+    display:none; /* מסתיר את אזור ההרשמה כברירת מחדל */
+    position: fixed; /* נשאר מקובע למסך */
+    top: 0; left: 0; width: 100%; height: 100%;
+    background-color: rgba(0, 0, 0, 0.85); /* מסך שחור כמעט אטום שמסתיר את הבית */
+    z-index: 1000; /* דואג שזה יהיה מעל הכל! */
+    justify-content: center; /* ממרכז אופקית */
+    align-items: center; /* ממרכז אנכית */
+}
+.register-section.show {
+    display: flex;/* כשנוסיף את המחלקה הזו מה-JS, אזור ההרשמה יופיע */
+}
+
+
+
+.register-box{
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    width: 320px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    text-align: center;
+}
+.register-section input {
+    cursor: pointer;
+    width: 90%;
+    margin-bottom: 15px;
+}
+.register-section button {
+    cursor: pointer;
+    width: 95%;
+    margin-bottom: 10px;
+}
+
+/* העיצוב של קוביית התגית עצמה */
+.chip {
+    display: inline-block;
+    background-color: #ff9800;
+    color: white;
+    padding: 5px 12px;
+    border-radius: 15px; /* הצורה של הגלולה */
+    margin: 5px;
+    font-size: 14px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* העיצוב של האיקס הקטן למחיקה */
+.chip-remove {
+    margin-left: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    color: #ffe0b2;
+}
+.chip-remove:hover { color: white; }
+
+/* 🌟 מודאל התראה מעוצב אישית 🌟 */
+#custom-alert-modal {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    /* רקע מושחר כמעט לגמרי לפי דרישה */
+    background-color: rgba(0, 0, 0, 0.90);
+    z-index: 9999;
+    display: none; /* מוסתר כברירת מחדל */
+    justify-content: center;
+    align-items: center;
+    /* אפקט חשיפה הדרגתי לרקע החשוך */
+    animation: fadeInBg 0.2s ease-in-out;
+}
+
+#custom-alert-modal.show {
+    display: flex;
+}
+
+/* עיצוב הקובייה הפנימית של החלון */
+.custom-alert-box {
+    background: #1f1f1f; /* צבע אפור כהה מאוד ומודרני */
+    color: #f1f1f1; /* טקסט בהיר וברור */
+    padding: 30px;
+    border-radius: 16px; /* פינות עגולות רכות */
+    width: 320px;
+    max-width: 80%;
+    text-align: center;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.8);
+    border: 1px solid #333;
+    /* אפקט הקפיצה למסך */
+    animation: popInAlert 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
+}
+
+.custom-alert-box p {
+    font-size: 16px;
+    line-height: 1.5;
+    margin-bottom: 25px;
+}
+
+.custom-alert-box button {
+    background-color: #ff6b6b; /* צבע ורוד-אדום מהעיצוב שלך */
+    color: white;
+    border: none;
+    padding: 12px 0;
+    width: 100%;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    margin: 0; /* דריסת מרג'ין ישן */
+}
+
+.custom-alert-box button:hover {
+    background-color: #ff4c4c;
+}
+
+.custom-alert-box button:active {
+    transform: scale(0.97); /* לחיצה ממש לחיצה */
+}
+
+/* אנימציות - נותן תחושה מקצועית של תפוח/גוגל */
+@keyframes popInAlert {
+    0% { transform: scale(0.9); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes fadeInBg {
+    from { background-color: rgba(0,0,0,0); }
+    to { background-color: rgba(0,0,0,0.90); }
+}
