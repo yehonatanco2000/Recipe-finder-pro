@@ -71,6 +71,9 @@ if (elements.closeAlertBtn) {
 window.removeChip = function(index) {
     removeSearchTag(index);
     renderChips(searchTags);
+    if (searchTags.length === 0) {
+        elements.homeBtn.click(); // מדמה לחיצה על כפתור הבית כדי לנקות את המסך
+    }
 };
 
 window.toggleDetails = function(element) {
