@@ -367,3 +367,21 @@ body {
     from { background-color: rgba(0,0,0,0); }
     to { background-color: rgba(0,0,0,0.90); }
 }
+
+/* --- אנימציית סיבוב מודרנית לטעינה --- */
+.spinner {
+    width: 50px;
+    height: 50px;
+    /* המסגרת האפורה-שקופה מסביב לעיגול */
+    border: 5px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    /* זה החלק כתום שיסתובב מעל המסגרת השקופה! */
+    border-top-color: #ff9800;
+    /* פקודת הקסם שמסובבת אותו באלגנטיות לנצח: */
+    animation: spin 1s ease-in-out infinite;
+    margin: 20px auto;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}

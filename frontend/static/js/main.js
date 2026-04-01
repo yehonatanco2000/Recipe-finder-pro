@@ -292,7 +292,8 @@ elements.favoritesBtn.addEventListener('click', async () => {
     
     elements.sidebar.classList.remove('open');
     elements.favoritesModal.classList.add('show');
-    elements.favoritesGrid.innerHTML = "<p style='color: white; text-align: center; width: 100%;'>Loading your favorites... ⏳</p>";
+    elements.favoritesGrid.innerHTML = "<div style='grid-column: 1 / -1; text-align: center; width: 100%;'><div class='spinner'></div><p style='color: black; margin-top: 15px;'>Cooking up your favorites... 👨‍🍳</p></div>";
+
 
     const data = await fetchWithDynamicRetry(() => fetchFavorites(currentUser), elements.favoritesGrid);
 
