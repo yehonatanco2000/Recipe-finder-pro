@@ -316,7 +316,7 @@ elements.favoritesBtn.addEventListener('click', async () => {
 
 // לחצן חיפוש
 elements.searchButton.addEventListener('click', async () => {
-
+    let selectedHealthLabels = []; // איפוס סינון תוויות בריאות בכל חיפוש מחדש
     if (elements.searchInput.value.trim() !== "") {
         addSearchTag(elements.searchInput.value.trim());
         elements.searchInput.value = "";
@@ -326,6 +326,10 @@ elements.searchButton.addEventListener('click', async () => {
     if (searchTags.length === 0) {
         return alert('Please enter an ingredient to search for recipes.');
     }
+    if (elements.vegan.checked) selectedHealthLabels.push(elements.vegan.value);
+    if (elements.vegetarian.checked) selectedHealthLabels.push(elements.vegetarian.value);
+    if (elements.glutenFree.checked) selectedHealthLabels.push(elements.glutenFree.value);
+    if (elements.peanut.checked) selectedHealthLabels.push(elements.peanut.value);
 
     const ingredientsStr = searchTags.join(',').toLowerCase();
     elements.sidebar.classList.remove('open');
@@ -334,7 +338,7 @@ elements.searchButton.addEventListener('click', async () => {
     let cuisine = elements.cuisineSelect.value;
 
     // מפעילים את כלי העזר הכללי שלנו! שולחים לו מה לעשות (החיפוש) ואיפה לגרף הודעות
-    const data = await fetchWithDynamicRetry(() => searchRecipes(ingredientsStr, cuisine), elements.searchMessage);
+    const data = await fetchWithDynamicRetry(() => searchRecipes(ingredientsStr, cuisine,selectedHealthLabels), elements.searchMessage);
 
    // אם הסוכן החזיר חלל ריק (null), סימן שהוא נכשל גם אחרי 3 ניסיונות!
     // ואז אנחנו פשוט יוצרים החוצה, הוא כבר הדפיס את התקלה במסך.
@@ -355,6 +359,18 @@ elements.searchButton.addEventListener('click', async () => {
         const isSaved = savedRecipeIds.includes(recipeData.id);
         elements.resultsContainer.innerHTML += createRecipeCardHTML(recipeData, isSaved, 'search');
     });
+});
+
+elements.themeToggle.addEventListener('click', () => {
+    // 1. הוספה והסרה אוטומטית של המחלקה 'dark-mode' מכל הגוף של האתר
+    document.body.classList.toggle('dark-mode');
+
+    // 2. עדכון חזותי קטן לכפתור - אם הוא דלוק המילה משנה לשמש, אחרת מדליקה ירח!
+    if (document.body.classList.contains('dark-mode')) {
+        elements.themeToggle.innerText = '☀️ Light Mode';
+    } else {
+        elements.themeToggle.innerText = '🌙 Dark Mode';
+    }
 });
 
 // ==========================================

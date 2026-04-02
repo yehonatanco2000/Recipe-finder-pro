@@ -14,7 +14,7 @@ class EdamamProvider(RecipeProvider):
         self.app_key = os.getenv('EDAMAM_APP_KEY')
 
 
-    def search(self,query,cuisine_type=None):
+    def search(self,query,cuisine_type=None,health_labels=None):
 
         # 2. אריזת הנתונים למילון
         api_params = {
@@ -23,7 +23,8 @@ class EdamamProvider(RecipeProvider):
             'app_id': self.app_id,
             'app_key': self.app_key
         }
-
+        if health_labels:
+            api_params['health'] = health_labels
 
         if cuisine_type and cuisine_type.lower() != "none":
             api_params['cuisineType'] = cuisine_type

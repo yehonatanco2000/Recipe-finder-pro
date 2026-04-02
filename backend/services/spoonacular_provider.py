@@ -10,7 +10,7 @@ class SpoonacularProvider(RecipeProvider):
         self.base_url = os.getenv('SPOONACULAR_BASE_URL')
         self.api_key = os.getenv('SPOONACULAR_API_KEY')
 
-    def search(self,query,cuisine_type=None):
+    def search(self,query,cuisine_type=None,health_labels=None):
         if not self.api_key:
             logging.error("❌ Spoonacular API key is missing!")
             return []
@@ -20,6 +20,22 @@ class SpoonacularProvider(RecipeProvider):
             'addRecipeInformation': 'true',  # פקודת קסם כדי לקבל את ה-URL
             'number': 20 # נבקש עד 20 תוצאות
         }
+        diet_labels = []
+        intolerance_labels = []
+        if health_labels:
+            for label in health_labels:
+                if label == "vegan":
+                    diet_labels.append("vegan")
+                elif label == "vegetarian":
+                    diet_labels.append("vegetarian")
+                elif label == "gluten-free":
+                    intolerance_labels.append("gluten")
+                elif label == "peanut-free":
+                    intolerance_labels.append("peanut")
+        if diet_labels:
+            api_params['diet'] = ','.join(diet_labels)
+        if intolerance_labels:
+            api_params['intolerances'] = ','.join(intolerance_labels)
         if cuisine_type and cuisine_type.lower() != "none":
             api_params['cuisine'] = cuisine_type
         try:

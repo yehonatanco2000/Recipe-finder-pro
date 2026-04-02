@@ -11,7 +11,7 @@ class TastyProvider(RecipeProvider):
         self.api_key = os.getenv('TASTY_API_KEY')
         self.api_host = os.getenv('TASTY_API_HOST')
 
-    def search(self, query, cuisine_type=None):
+    def search(self, query, cuisine_type=None, health_labels=None):
         if not self.api_key:
             logging.error("❌ Tasty API key is missing!")
             return []
@@ -26,6 +26,17 @@ class TastyProvider(RecipeProvider):
             "size": "20",
             "q": query
         }
+        tag_labels = []
+        if health_labels:
+            for label in health_labels:
+                if label == "vegan":
+                    tag_labels.append("vegan")
+                elif label == "vegetarian":
+                    tag_labels.append("vegetarian")
+                elif label == "gluten-free":
+                    tag_labels.append("gluten_free")
+        if tag_labels:
+            api_params['tags'] = ','.join(tag_labels)
         # התעלמנו זמנית מ-cuisine_type כי ל-Tasty יש שיטת תיוג שונה מאוד
         try:
             response = requests.get(self.base_url, headers=headers, params=api_params)

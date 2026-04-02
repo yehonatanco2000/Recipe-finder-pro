@@ -105,6 +105,7 @@ body {
               box-sizing: border-box;
               text-align: right;
               z-index: 1000; /* מנצח את כרטיסיות המתכונים ונשאר מעליהן! */
+              overflow-y: auto; /* מוסיף גלילה אם התפריט ארוך מדי */
             }
       .sidebar.open {
                     right: 0; /* כשהמחלקה 'open' מתווספת, הסר את ההסתרה והצג את הסרגל */
@@ -384,4 +385,114 @@ body {
 
 @keyframes spin {
     to { transform: rotate(360deg); }
+}
+
+/* מיישר למרכז את התיבה והשם, ומוודא שיש רווח ביניהם */
+.checkbox-row {
+    display: flex;
+    flex-direction: row-reverse; /* הקסם שהופך את המיקומים */
+    justify-content: center; /* יושב בדיוק באמצע הסיידבר */
+    align-items: center;
+    gap: 15px; /* רווח נקי וקבוע בין התיבה למילה */
+    margin-bottom: 12px;
+}
+
+/* מנטרל שוליים טיפשיים בכובד המקורי של דפדפנים, ונותן רק רווח מצד ימין */
+.checkbox-row input {
+    margin: 0;
+    cursor: pointer;
+    width: 18px; /* קצת הגדלנו את הקוביה שיהיה קל ללחוץ */
+    height: 18px;
+}
+
+.checkbox-row label {
+    cursor: pointer;
+    font-size: 16px;
+    width: 90px; /* רוחב קבוע למילים ימנע שבירתן */
+    text-align: right; 
+}
+
+/* 🌟 בונוס של סיניורים: עיצוב פס הגלילה הכפול! 🌟 */
+/* הופך את הפס של התפריט העליון לדקיק, עדין ולא מורגש עד שחגים מעליו */
+.sidebar::-webkit-scrollbar {
+    width: 6px; 
+}
+.sidebar::-webkit-scrollbar-thumb {
+    background: #e0e0e0; 
+    border-radius: 10px;
+}
+.sidebar::-webkit-scrollbar-thumb:hover {
+    background: #b0b0b0; 
+}
+
+
+/* ========================================== */
+/* 🌙 מצב לילה (Dark Mode) - חבילת נושא 🌙 */
+/* ========================================== */
+
+/* מוסיף הגדרת מעבר (אנימציה) לכל האלמנטים המרכזיים שמשנים צבע כדי שההחלפה תהיה חלקה כמו חמאה ולא תוקפנית */
+body, .sidebar, .recipe-card, .login-box, .register-box, .favorites-box, input, select {
+    transition: background-color 0.4s ease, color 0.4s ease, background-image 0.4s ease;
+}
+
+/* כל מה שכתוב למטה יתעורר לחיים רק תחת התנאי אחד: שיש ל-body מחלקה בשם dark-mode */
+body.dark-mode {
+    /* מחזיר את תמונת הרקע אבל מוסיף לה "משקפי שמש" של 75% שקיפות שחורה! */
+    background-image: linear-gradient(rgba(0,0,0,0.75), rgba(0,0,0,0.75)), url('/static/images/background.png');
+    background-color: #1e1e1e; /* אפור פחם עדין יותר במקום שחור מוחלט */
+    color: #e0e0e0;
+}
+
+body.dark-mode h1 {
+    color: #ff9800; /* כותרת ראשית כתומה שתזהר בחושך */
+}
+
+/* כרטיסיות, תיבות הרשמה ומועדפים יהיו באזור אפור בינוני */
+body.dark-mode .recipe-card,
+body.dark-mode .favorites-box,
+body.dark-mode .login-box,
+body.dark-mode .register-box {
+    background-color: #333333; /* טיפה יותר בהיר ממה שהיה כדי למנוע קונטרסט צורב */
+    color: #e0e0e0;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5); /* צל חזק יותר מפצה על הרקע הכהה */
+}
+
+/* עיצוב רקעת התיבה הסוגרת של ההמלצות */
+body.dark-mode #recommendations {
+    background-color: rgba(30, 30, 30, 0.85) !important;
+}
+
+/* תפריט הסיידבר מקבל שחור-כלא */
+body.dark-mode .sidebar {
+    background-color: #252525;
+    color: #e0e0e0;
+    border-left: 1px solid #444;
+}
+
+/* צבעי קלט קופסאות חיפוש, יקבלו שחור מאט */
+body.dark-mode input,
+body.dark-mode select {
+    background-color: #333;
+    color: white;
+    border: 1px solid #555;
+}
+
+/* השחרת כפתורי סיידבר ספציפיים (דורס את העיצוב הלבן שיש ב-HTML) */
+body.dark-mode #home-btn,
+body.dark-mode #favorites-list-btn {
+    background-color: #3b3b3b !important;
+    border-color: #555 !important;
+    color: #e0e0e0 !important;
+}
+
+/* השחרת ושכפול כל הטקסטים שהיו בעבר שחורים בכוח - עכשיו יהיו לבנים עדינים */
+body.dark-mode h2, 
+body.dark-mode h3, 
+body.dark-mode h4,
+body.dark-mode p,
+body.dark-mode label,
+body.dark-mode #close-sidebar,
+body.dark-mode #logout-btn,
+body.dark-mode #open-login-sidebar {
+    color: #e0e0e0 !important;
 }

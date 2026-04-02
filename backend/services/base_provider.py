@@ -3,7 +3,7 @@ class RecipeProvider(ABC):
     def __init__(self,name):
         self.name=name
     @abstractmethod
-    def search(self,query,cuisine_type=None):
+    def search(self,query,cuisine_type=None,health_labels=None):
         pass
     @abstractmethod
     def _convert_to_recipe(self,raw_data):

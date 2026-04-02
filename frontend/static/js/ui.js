@@ -40,7 +40,12 @@ export const elements = {
     cuisineSelect: document.getElementById('cuisine-select'),
     customAlertModal: document.getElementById('custom-alert-modal'),
     customAlertText: document.getElementById('custom-alert-text'),
-    closeAlertBtn: document.getElementById('close-alert-btn')
+    closeAlertBtn: document.getElementById('close-alert-btn'),
+    vegan: document.getElementById('vegan-check'),
+    vegetarian: document.getElementById('vegetarian-check'),
+    glutenFree: document.getElementById('gluten-check'),
+    peanut: document.getElementById('peanut-check'),
+    themeToggle: document.getElementById('theme-toggle')
 };
 
 /**

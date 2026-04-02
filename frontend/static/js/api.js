@@ -47,8 +47,8 @@ export async function fetchFavorites(username) {
     return await apiCall(`/favorites?username=${username}`, 'GET');
 }
 
-export async function searchRecipes(ingredients, cuisine) {
-    return await apiCall(`/search?ingredients=${ingredients}&cuisine=${cuisine}`, 'GET');
+export async function searchRecipes(ingredients, cuisine,selectedHealthLabels) {
+    return await apiCall(`/search?ingredients=${ingredients}&cuisine=${cuisine}&selectedHealthLabels=${selectedHealthLabels}`, 'GET');
 }
 
 export async function fetchRecommendations(username) {

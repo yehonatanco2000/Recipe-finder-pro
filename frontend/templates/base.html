@@ -14,6 +14,7 @@
     <button id = "menu-button"> ☰ </button>
     <div id = "sidebar" class="sidebar">
         <button id = "close-sidebar">close ✖</button>
+        <button id="theme-toggle" style="background-color: #333; color: white; width: 80%; display: block; margin: 20px auto;">🌙 Dark Mode</button>
     <h3 id="user-greeting" style="display: none; color: #4CAF50; text-align: center; margin-bottom: 20px; direction: ltr;"></h3>
         <button id="home-btn" style="background-color: #f8f9fa; color: #333; border: 1px solid #ddd; margin-top: 10px;">Home 🏠</button>
         <button id="favorites-list-btn" style="display: none; background-color: #f8f9fa; color: #333; border: 1px solid #ddd; margin-top: 10px;">My favorites ❤️ </button>
@@ -29,6 +30,40 @@
             <option value="mediterranean">Mediterranean</option>
             <option value="mexican">Mexican</option>
         </select>
+    <!-- כותרת יפה שמפרידה את האזור -->
+    <h3 style="text-align: center; margin-top: 20px;">Health & Allergies</h3>
+
+    <!-- התחלה של קוביית רשימת הסימונים (קונטיינר) -->
+    <div id="allergies-container">
+
+        <!-- השורה הראשונה: טבעוני -->
+        <div class ="checkbox-row">
+            <!-- אלמנט הקופסא של הוי. יש לו ID שנוכל למצוא ב-JS, ויש לו VALUE שזה מה שאדמם יקבל מתחת למכסה המנוע -->
+            <input type="checkbox" id="vegan-check" value="vegan">
+
+            <!-- אלמנט התוית. זה מה שהמשתמש רואה על המסך. אנחנו משדכים אותו באמצעות attribut ה-'for' בדיוק לאותו ה-ID של התיבה! -->
+            <label for="vegan-check">Vegan</label>
+        </div>
+
+        <!-- השורה השנייה: ללא גלוטן -->
+        <div class ="checkbox-row">
+            <input type="checkbox" id="gluten-check" value="gluten-free">
+            <label for="gluten-check">Gluten-Free</label>
+        </div>
+
+        <!-- השורה השלישית: ללא בוטנים -->
+        <div class ="checkbox-row">
+            <input type="checkbox" id="peanut-check" value="peanut-free">
+            <label for="peanut-check">Peanut-Free</label>
+        </div>
+
+        <div class ="checkbox-row">
+            <input type="checkbox" id="vegetarian-check" value="vegetarian">
+            <label for="vegetarian-check">Vegetarian</label>
+        </div>
+
+    </div>
+
         <button id="logout-btn" class="sidebar-btn" style="display: none; background-color: none; color: black;">Logout 🚪</button>
     </div>
     <button id="search-button">Search</button>

@@ -13,6 +13,11 @@ def search_recipes():
     user_ingredients = request.args.get('ingredients')
     logging.info(f"🔍 Received search request with ingredients: {user_ingredients}")
     user_cuisine_type = request.args.get('cuisine')
+    health_labels = request.args.get('selectedHealthLabels')
+    if health_labels:
+        health_labels = health_labels.split(",")  # המרת מחרוזת לרשימה
+    else:
+        health_labels = []
 
     # הגנת שרת: אם לא שלחו לנו מצרכים, נחזיר הודעת שגיאה
     if not user_ingredients:
@@ -21,7 +26,7 @@ def search_recipes():
 
     # 1. שולחים את השליח שלנו (הפונקציה מהקובץ השני) שיביא את הנתונים
     manager = RecipeManager()
-    recipes = manager.search_all(user_ingredients, user_cuisine_type)
+    recipes = manager.search_all(user_ingredients, user_cuisine_type, health_labels)
     recipes_data = [recipe.to_dict() for recipe in recipes]
     if recipes_data != []:
         logging.info(f"✅ Successfully fetched recipes for ingredients: {user_ingredients}")

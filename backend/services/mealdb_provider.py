@@ -9,7 +9,11 @@ class MealDBProvider(RecipeProvider):
         super().__init__("mealdb")
         self.base_url = os.getenv('MEALDB_BASE_URL')
 
-    def search(self,query,cuisine_type=None):
+    def search(self,query,cuisine_type=None,health_labels=None):
+        if health_labels:
+            logging.warning("⚠️ MealDB does not support health labels. Ignoring this filter.")
+            return []
+
         api_params = {
             's': query
         }
