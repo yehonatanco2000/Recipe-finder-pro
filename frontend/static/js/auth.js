@@ -1,26 +1,30 @@
 // frontend/js/auth.js
 
 /**
- * קובץ זה מנהל את כל הסטטוס (State) של המשתמש.
- * הוא מחזיק האם מחוברים, מה השם, ואילו מועדפים יש.
- * אין כאן פניות לשרת ולא נגיעות במסך ה-HTML!
+ * State Management Module.
+ * This file maintains the application's runtime status, including user sessions,
+ * saved recipe IDs, and active search tags. It does not perform API calls or direct DOM manipulation.
  */
 
-// משתני מערכת (מיוצאים כדי ש-main יוכל לקרוא אותם)
+// Exported state variables (Accessed by main.js and ui.js)
 export let isLoggedIn = false;
 export let currentUser = ""; 
 export let savedRecipeIds = []; 
 export let searchTags = [];
 
-// פעולת התחברות
+/**
+ * Updates the state to 'logged in' and persists the user session.
+ */
 export function login(username) {
     isLoggedIn = true;
     currentUser = username;
-    // שומרים גם בכספת של הדפדפן כדי לזכור אותו לפעם הבאה
+    // Persist the user in localStorage for session restoration on page load
     localStorage.setItem('savedUser', username);
 }
 
-// פעולת התנתקות
+/**
+ * Resets the application state on logout.
+ */
 export function logout() {
     isLoggedIn = false;
     currentUser = "";
@@ -28,30 +32,43 @@ export function logout() {
     localStorage.removeItem('savedUser');
 }
 
-// עדכון רשימת המועדפים (כאשר שואבים אותם מהשרת)
+/**
+ * Updates the global list of favorite recipe IDs (synchronized from the server).
+ */
 export function updateSavedRecipes(idsArray) {
     savedRecipeIds = idsArray;
 }
 
-// הוספת מועדף
+/**
+ * Adds a recipe ID to the local favorites collection.
+ */
 export function addSavedRecipe(id) {
     if (!savedRecipeIds.includes(id)) {
         savedRecipeIds.push(id);
     }
 }
 
-// הסרת מועדף
+/**
+ * Removes a recipe ID from the local favorites collection.
+ */
 export function removeSavedRecipe(id) {
     savedRecipeIds = savedRecipeIds.filter(savedId => savedId !== id);
 }
 
-// ניהול תגיות חיפוש
+// ----------------------------------------------------
+// Search Tag Management
+// ----------------------------------------------------
+
+/**
+ * Adds a unique search tag to the collection.
+ * @returns {boolean} - true if the tag was added, false if it already exists or is empty.
+ */
 export function addSearchTag(tag) {
     if (tag !== '' && !searchTags.includes(tag)) {
         searchTags.push(tag);
-        return true; // הצליח
+        return true; 
     }
-    return false; // התגית כבר קיימת או ריקה
+    return false; 
 }
 
 export function removeSearchTag(index) {

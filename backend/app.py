@@ -4,6 +4,7 @@ from database_manager import db
 from routes.auth_routes import auth_bp
 from routes.recipe_routes import recipe_bp
 from routes.recommendation_routes import recommendation_bp
+from routes.vision_routes import vision_bp
 from config import PORT
 import logging
 import os
@@ -17,9 +18,11 @@ app = Flask(__name__,
 
 CORS(app)
 
+
 app.register_blueprint(auth_bp)
 app.register_blueprint(recipe_bp)
 app.register_blueprint(recommendation_bp)
+app.register_blueprint(vision_bp)
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -33,4 +36,4 @@ def home():
 
 if __name__ == '__main__':
     db.init_db()  # וודא שהטבלה קיימת לפני שהשרת מתחיל לעבוד
-    app.run(debug=True, port=PORT)
+    app.run(debug=True, host='0.0.0.0', port=PORT)

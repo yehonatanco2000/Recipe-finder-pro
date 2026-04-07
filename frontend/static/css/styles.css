@@ -1,498 +1,283 @@
+/* ====================================================== */
+/* 💎 "Pro" DESIGN SYSTEM - FINAL SIDEBAR USABILITY 💎 */
+/* ====================================================== */
+
+:root {
+    --pro-glass: rgba(255, 255, 255, 0.45); 
+    --pro-border: rgba(0, 0, 0, 0.05);
+    --pro-blur: 25px;
+    --apple-blue: #007aff;
+    --apple-green: #34c759;
+    --apple-red: #ff3b30;
+    --apple-pink: #ff5a5f; 
+    --bg-light: #f5f5f7;
+    --modal-bg: #e5e5ea; 
+    --text-light: #1d1d1f;
+}
 
 body {
-      background-image: url('/static/images/background.png'); /* תמונת רקע */
-      /* גורם לתמונה לכסות את כל המסך ולא לחזור על עצמה */
-      background-size: cover;
-      background-position: center;
-       background-attachment: fixed;
-      background-repeat: no-repeat;
-      font-family: Arial, sans-serif; /* פונט נקי */
-      display: flex; /* הופך את הגוף לקונטיינר גמיש */
-      flex-direction: column; /* מסדר את הילדים (התוכן) בעמודה */
-      text-align: center; /* ממרכז את כל התוכן לאמצע המסך */
-      margin-top: 135px; /* מוריד את הכל קצת למטה כדי שלא יידבק לתקרה */
-      }
-
-      h1 {
-          color: white; /* צבע אפור כהה לכותרת */
-            font-size: 36px; /* גודל הכותרת */
-            margin-bottom: 20px; /* רווח מתחת לכותרת */
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.1); /* מוסיף צל קל לטקסט כדי להבליט אותו על הרקע */
-            height: 20px; /* גובה קבוע לכותרת כדי למנוע שינוי גודל כשהטקסט משתנה */
-         }
-
-      input {
-            margin: 20px auto; /* מוסיף רווח מעל ומתחת וממרכז את התיבה */
-            padding: 10px; /* רווח פנימי כדי שהתיבה תהיה שמנמנה */
-            width: 300px; /* רוחב התיבה */
-            border: 2px solid #ccc; /* מסגרת אפורה */
-            border-radius: 5px; /* הנה הרדיוס שלמדנו! מעגל את הפינות */
-            font-size: 16px; /* גודל הטקסט שנקליד בפנים */
-            }
-
-      button {
-            padding: 10px 20px; /* רווח פנימי כדי שהכפתור יהיה שמנמן ונוח ללחיצה */
-            width: 200px; /* רוחב הכפתור */
-            margin: 20px auto; /* מוסיף רווח מעל ומתחת וממרכז את הכפתור */
-            background-color: #ff6b6b; /* צבע אדמדם-כתום */
-            color: white; /* טקסט לבן */
-            border: none; /* מוריד את המסגרת המכוערת שיש כברירת מחדל */
-            border-radius: 5px; /* פינות מעוגלות */
-            font-size: 16px;
-            cursor: pointer; /* הופך את סמן העכבר ליד לוחצת כשעוברים מעל */
-            }
-
-      button:hover {
-                   background-color: #ff4c4c;
-                   }
-
-      .recipe-card {
-          background-color: white;
-          position: relative;
-          border-radius: 12px;
-          padding: 15px;
-          margin: 0;
-          box-shadow: 0 4px 10px rgba(0,0,0,0.06);
-          transition: transform 0.3s ease, box-shadow 0.3s ease;
-      }
-      
-      .recipe-card:hover {
-          transform: translateY(-7px);
-          box-shadow: 0 12px 20px rgba(0,0,0,0.12);
-      }
-      
-      .recipe-card img {
-          width: 100%;
-          height: 180px;
-          object-fit: contain; /* שומר על התמונה במלואה בלי לחתוך אותה */
-          background-color: #f9f9f9; /* רקע עדין כדי למלא את החלל הריק במראה נקי */
-          border-radius: 8px;
-          margin-bottom: 12px;
-      }
-
-      #results, #recommendations-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-          gap: 25px;
-          width: 85%; 
-          margin: 30px auto;
-          align-items: start; /* מונע משאר הכרטיסיות באותה שורה להימתח כשאחת נפתחת */
-      }
-      #recommendations {
-          padding-top: 20px;
-          padding-bottom: 20px;
-      }
-      #menu-button {
-                   position: absolute; /* מוציא את הכפתור מהסדר הרגיל */
-                   top: 20px;
-                   right: 20px; /* מצמיד אותו לפינה הימנית העליונה */
-                   font-size: 30px;
-                   background: none;
-                   border: none;
-                   cursor: pointer;
-                   color: white;
-        }
-      .sidebar{
-              position: fixed; /* מקבע אותו למסך כדי שיישאר גם כשגוללים */
-              top: 0;
-              right: -300px; /* מוחבא מחוץ למסך בצד ימין! */
-              width: 250px;
-              height: 100%;
-              background-color: white;
-              box-shadow: -2px 0 10px rgba(0,0,0,0.2);
-              transition: right 0.3s ease; /* אנימציה חלקה - החלקה במקום קפיצה */
-              padding: 20px;
-              box-sizing: border-box;
-              text-align: right;
-              z-index: 1000; /* מנצח את כרטיסיות המתכונים ונשאר מעליהן! */
-              overflow-y: auto; /* מוסיף גלילה אם התפריט ארוך מדי */
-            }
-      .sidebar.open {
-                    right: 0; /* כשהמחלקה 'open' מתווספת, הסר את ההסתרה והצג את הסרגל */
-                    }
-      #close-sidebar{
-                    font-size: 20px;
-                    background: none;
-                    border: none;
-                    cursor: pointer;
-                    color: #CD5C5C;
-                    margin-bottom: 20px;
-                    }
-/* --- תוספות חדשות עבור כרטיסיות נפתחות בלחיצה (אקורדיון) --- */
-      .clickable {
-                cursor: pointer; /* הופך את סמן העכבר ליד לוחצת */
-                transition: opacity 0.2s; /* אנימציה חלקה כשמרחפים */
-                }
-
-      .clickable:hover {
-                      opacity: 0.8; /* נותן אפקט ריחוף קל על התמונה והכותרת */
-                      }
-
-      #favorites-list-btn{
-                    font-size: 15px;
-                    background: none;
-                    border: none;
-                    cursor: pointer;
-                    color: black;
-                    margin-bottom: 20px;
-                    }
-      .favorites-box{
-                    background: white;
-                    position: relative; /* מאפשר למקם את כפתור הסגירה בתוך הקובייה */
-                    padding: 30px;
-                    border-radius: 15px;
-                    width: 80%;
-                    max-height: 80vh; /* מגביל את הגובה כדי למנוע מהחלון להיות ענק אם יש הרבה מתכונים */
-                    overflow-y: auto; /* מוסיף פס גלילה אנכי אם התוכן גבוה מדי*/
-                    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-                    text-align: center;
-      }
-      #favorites-grid{
-                    display: grid;
-                    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-                    gap: 20px;
-      }
-      #cuisine-select {
-            text-align: center;
-            text-align-last: center; /* זה הטריק שממרכז את הטקסט בתיבה! */
-            width: 80%; /* אפשר לשחק עם הרוחב כדי שייראה טוב בתפריט */
-            margin: 0 auto; /* ממקם את התיבה עצמה באמצע */
-            display: block;
-            }
-
-      .recipe-details {
-            display: none; /* מסתיר את התוכן כברירת מחדל! */
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 1px solid #eee;
-            text-align: left; /* מיישר את הקלוריות והקישור לאנגלית */
-           }
-
-      .recipe-details.show {
-            display: block; /* כשנוסיף את המחלקה הזו מה-JS, התוכן יופיע */
-            }
-
-      /* --- עיצוב כפתור השמירה (לב) --- */
-.save-btn {
-    position: absolute; /* מאפשר ללב לרחף בתוך הקובייה */
-    top: 10px; /* מרחק מהלמעלה של הקובייה */
-    left: 10px; /* מרחק מצד שמאל! */
-    background: white; /* רקע עגול לבן מאחורי הלב */
-    border-radius: 50%;
-    border: none;
-    font-size: 20px; /* גודל הלב קטן יותר ממה שהיה */
-    width: 35px; /* עיגול מושלם */
-    height: 35px;
-    cursor: pointer;
-    transition: transform 0.2s, background-color 0.2s; /* אנימציה חלקה */
+    background-color: var(--bg-light);
+    font-family: 'Outfit', sans-serif;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    z-index: 10; /* מוודא שהלב מעל התמונה תמיד וחץ העכבר לא מתבלבל */
-}
-
-.save-btn:hover {
-    background-color: #f0f0f0; /* מקבל צבע קצת אפור בריחוף כדי לדעת שלוחצים */
-    transform: scale(1.15); /* כשהעכבר עליו, הלב קצת גדל (אפקט פעימה) */
-    opacity: 1 !important; /* דורס את האטימות מהכרטיסייה */
-}
-
-/* --- עיצוב החלון הקופץ (Modal) --- */
-.modal-overlay {
-    display: none; /* החלון מוסתר בהתחלה */
-    position: fixed; /* נשאר מקובע למסך */
-    top: 0; left: 0; width: 100%; height: 100%;
-    background-color: rgba(0, 0, 0, 0.85); /* מסך שחור כמעט אטום שמסתיר את הבית */
-    z-index: 1000; /* דואג שזה יהיה מעל הכל! */
-    justify-content: center; /* ממרכז אופקית */
-    align-items: center; /* ממרכז אנכית */
-}
-
-/* כשנוסיף את המחלקה הזו מה-JS, החלון יופיע */
-.modal-overlay.show {
-    display: flex;
-}
-#open-login-sidebar{
-    font-size: 15px;
-    background: #74a9ff;
-    border: none;
-    cursor: pointer;
-    color: black;
-    margin-bottom: 20px;
-}
-
-.login-box {
-    background: white;
-    padding: 30px;
-    border-radius: 15px;
-    width: 320px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-    text-align: center;
-}
-
-.login-box input {
-    width: 90%;
-    margin-bottom: 15px;
-    /* העיצוב שכבר הגדרת ל-input שלך יעבוד גם כאן אוטומטית! */
-}
-
-.login-box button {
-    width: 95%;
-    margin-bottom: 10px;
-}
-
-.register-section{
-    display:none; /* מסתיר את אזור ההרשמה כברירת מחדל */
-    position: fixed; /* נשאר מקובע למסך */
-    top: 0; left: 0; width: 100%; height: 100%;
-    background-color: rgba(0, 0, 0, 0.85); /* מסך שחור כמעט אטום שמסתיר את הבית */
-    z-index: 1000; /* דואג שזה יהיה מעל הכל! */
-    justify-content: center; /* ממרכז אופקית */
-    align-items: center; /* ממרכז אנכית */
-}
-.register-section.show {
-    display: flex;/* כשנוסיף את המחלקה הזו מה-JS, אזור ההרשמה יופיע */
-}
-
-
-
-.register-box{
-    background: white;
-    padding: 30px;
-    border-radius: 15px;
-    width: 320px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-    text-align: center;
-}
-.register-section input {
-    cursor: pointer;
-    width: 90%;
-    margin-bottom: 15px;
-}
-.register-section button {
-    cursor: pointer;
-    width: 95%;
-    margin-bottom: 10px;
-}
-
-/* העיצוב של קוביית התגית עצמה */
-.chip {
-    display: inline-block;
-    background-color: #ff9800;
-    color: white;
-    padding: 5px 12px;
-    border-radius: 15px; /* הצורה של הגלולה */
-    margin: 5px;
-    font-size: 14px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-/* העיצוב של האיקס הקטן למחיקה */
-.chip-remove {
-    margin-left: 8px;
-    cursor: pointer;
-    font-weight: bold;
-    color: #ffe0b2;
-}
-.chip-remove:hover { color: white; }
-
-/* 🌟 מודאל התראה מעוצב אישית 🌟 */
-#custom-alert-modal {
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    /* רקע מושחר כמעט לגמרי לפי דרישה */
-    background-color: rgba(0, 0, 0, 0.90);
-    z-index: 9999;
-    display: none; /* מוסתר כברירת מחדל */
-    justify-content: center;
-    align-items: center;
-    /* אפקט חשיפה הדרגתי לרקע החשוך */
-    animation: fadeInBg 0.2s ease-in-out;
-}
-
-#custom-alert-modal.show {
-    display: flex;
-}
-
-/* עיצוב הקובייה הפנימית של החלון */
-.custom-alert-box {
-    background: #1f1f1f; /* צבע אפור כהה מאוד ומודרני */
-    color: #f1f1f1; /* טקסט בהיר וברור */
-    padding: 30px;
-    border-radius: 16px; /* פינות עגולות רכות */
-    width: 320px;
-    max-width: 80%;
-    text-align: center;
-    box-shadow: 0 15px 35px rgba(0,0,0,0.8);
-    border: 1px solid #333;
-    /* אפקט הקפיצה למסך */
-    animation: popInAlert 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
-}
-
-.custom-alert-box p {
-    font-size: 16px;
-    line-height: 1.5;
-    margin-bottom: 25px;
-}
-
-.custom-alert-box button {
-    background-color: #ff6b6b; /* צבע ורוד-אדום מהעיצוב שלך */
-    color: white;
-    border: none;
-    padding: 12px 0;
-    width: 100%;
-    border-radius: 8px;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background 0.2s, transform 0.1s;
-    margin: 0; /* דריסת מרג'ין ישן */
-}
-
-.custom-alert-box button:hover {
-    background-color: #ff4c4c;
-}
-
-.custom-alert-box button:active {
-    transform: scale(0.97); /* לחיצה ממש לחיצה */
-}
-
-/* אנימציות - נותן תחושה מקצועית של תפוח/גוגל */
-@keyframes popInAlert {
-    0% { transform: scale(0.9); opacity: 0; }
-    100% { transform: scale(1); opacity: 1; }
-}
-
-@keyframes fadeInBg {
-    from { background-color: rgba(0,0,0,0); }
-    to { background-color: rgba(0,0,0,0.90); }
-}
-
-/* --- אנימציית סיבוב מודרנית לטעינה --- */
-.spinner {
-    width: 50px;
-    height: 50px;
-    /* המסגרת האפורה-שקופה מסביב לעיגול */
-    border: 5px solid rgba(255, 255, 255, 0.3);
-    border-radius: 50%;
-    /* זה החלק כתום שיסתובב מעל המסגרת השקופה! */
-    border-top-color: #ff9800;
-    /* פקודת הקסם שמסובבת אותו באלגנטיות לנצח: */
-    animation: spin 1s ease-in-out infinite;
-    margin: 20px auto;
-}
-
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
-
-/* מיישר למרכז את התיבה והשם, ומוודא שיש רווח ביניהם */
-.checkbox-row {
-    display: flex;
-    flex-direction: row-reverse; /* הקסם שהופך את המיקומים */
-    justify-content: center; /* יושב בדיוק באמצע הסיידבר */
-    align-items: center;
-    gap: 15px; /* רווח נקי וקבוע בין התיבה למילה */
-    margin-bottom: 12px;
-}
-
-/* מנטרל שוליים טיפשיים בכובד המקורי של דפדפנים, ונותן רק רווח מצד ימין */
-.checkbox-row input {
     margin: 0;
+    min-height: 100vh;
+    color: var(--text-light);
+    overflow-x: hidden;
+    direction: ltr;
+    position: relative;
+}
+
+/* 🖼️ BACKGROUND SYSTEM */
+#bg-video {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    z-index: -2;
+}
+
+#bg-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(255, 255, 255, 0.35); 
+    backdrop-filter: blur(0.2px); 
+    z-index: -1;
+}
+
+/* 🏔️ TOP NAVIGATION BUTTONS */
+#open-login-homepage {
+    position: absolute;
+    top: 25px; left: 25px;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--pro-border);
+    color: var(--text-light);
+    padding: 10px 22px;
+    border-radius: 14px;
     cursor: pointer;
-    width: 18px; /* קצת הגדלנו את הקוביה שיהיה קל ללחוץ */
-    height: 18px;
+    font-size: 0.95rem; font-weight: 600;
+    z-index: 1000;
+    transition: all 0.3s;
 }
 
-.checkbox-row label {
+#menu-button {
+    position: absolute;
+    top: 25px; right: 25px;
+    width: 50px; height: 50px;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--pro-border);
+    color: var(--text-light);
+    border-radius: 50%;
+    font-size: 1.5rem; 
     cursor: pointer;
-    font-size: 16px;
-    width: 90px; /* רוחב קבוע למילים ימנע שבירתן */
-    text-align: right; 
+    z-index: 1000;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.3s;
 }
 
-/* 🌟 בונוס של סיניורים: עיצוב פס הגלילה הכפול! 🌟 */
-/* הופך את הפס של התפריט העליון לדקיק, עדין ולא מורגש עד שחגים מעליו */
-.sidebar::-webkit-scrollbar {
-    width: 6px; 
-}
-.sidebar::-webkit-scrollbar-thumb {
-    background: #e0e0e0; 
-    border-radius: 10px;
-}
-.sidebar::-webkit-scrollbar-thumb:hover {
-    background: #b0b0b0; 
+h1 {
+    font-size: 3.8rem;
+    font-weight: 700;
+    margin-top: 100px;
+    margin-bottom: 35px;
+    letter-spacing: -2px;
+    color: var(--text-light);
+    text-shadow: 0 5px 15px rgba(0,0,0,0.05);
 }
 
-
-/* ========================================== */
-/* 🌙 מצב לילה (Dark Mode) - חבילת נושא 🌙 */
-/* ========================================== */
-
-/* מוסיף הגדרת מעבר (אנימציה) לכל האלמנטים המרכזיים שמשנים צבע כדי שההחלפה תהיה חלקה כמו חמאה ולא תוקפנית */
-body, .sidebar, .recipe-card, .login-box, .register-box, .favorites-box, input, select {
-    transition: background-color 0.4s ease, color 0.4s ease, background-image 0.4s ease;
+/* 🔍 SEARCH BAR SYSTEM */
+.search-bar {
+    display: flex; align-items: center;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(25px);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    border-radius: 60px;
+    padding: 8px 10px;
+    width: 90%; max-width: 580px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.05);
+    margin: 0 auto 50px auto;
 }
 
-/* כל מה שכתוב למטה יתעורר לחיים רק תחת התנאי אחד: שיש ל-body מחלקה בשם dark-mode */
-body.dark-mode {
-    /* מחזיר את תמונת הרקע אבל מוסיף לה "משקפי שמש" של 75% שקיפות שחורה! */
-    background-image: linear-gradient(rgba(0,0,0,0.75), rgba(0,0,0,0.75)), url('/static/images/background.png');
-    background-color: #1e1e1e; /* אפור פחם עדין יותר במקום שחור מוחלט */
-    color: #e0e0e0;
+.search-input-wrapper { flex: 1; display: flex; align-items: center; padding-left: 20px; }
+#search-input { background: transparent; border: none; color: #1d1d1f; width: 100%; font-size: 1.2rem; outline: none; }
+#search-button { background: transparent; border: none; font-size: 1.3rem; cursor: pointer; padding: 0 10px; }
+#snap-btn {
+    background: linear-gradient(135deg, var(--apple-blue), #5e5ce6);
+    border: none; width: 48px; height: 48px; border-radius: 50%;
+    color: white; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.95rem;
 }
 
-body.dark-mode h1 {
-    color: #ff9800; /* כותרת ראשית כתומה שתזהר בחושך */
+/* 🥗 RECIPE CARDS - ABSOLUTE CENTERED & COMPACT */
+#results, #recommendations {
+    display: none;
+    width: 100%;
+    margin: 40px auto;
+    text-align: center;
+}
+body.logged-in #results, body.logged-in #recommendations { display: block !important; }
+
+#results, #recommendations-grid, #favorites-grid {
+    display: flex !important;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 30px;
+    margin: 0 auto;
+    width: 100%;
 }
 
-/* כרטיסיות, תיבות הרשמה ומועדפים יהיו באזור אפור בינוני */
-body.dark-mode .recipe-card,
-body.dark-mode .favorites-box,
-body.dark-mode .login-box,
-body.dark-mode .register-box {
-    background-color: #333333; /* טיפה יותר בהיר ממה שהיה כדי למנוע קונטרסט צורב */
-    color: #e0e0e0;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.5); /* צל חזק יותר מפצה על הרקע הכהה */
+.recipe-card {
+    background: var(--pro-glass);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 24px; 
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    width: 270px;
+    min-height: 280px; 
+    transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+    position: relative;
+}
+.recipe-card:hover { transform: translateY(-8px); box-shadow: 0 20px 50px rgba(0,0,0,0.06); }
+
+.card-image-wrapper {
+    position: relative;
+    width: 100%; padding-top: 65%;
+    overflow: hidden; border-radius: 16px; margin-bottom: 10px;
+}
+.card-image-wrapper img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; cursor: pointer; }
+
+.save-btn {
+    position: absolute; top: 10px; left: 10px;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    width: 34px; height: 34px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    z-index: 10; cursor: pointer;
 }
 
-/* עיצוב רקעת התיבה הסוגרת של ההמלצות */
-body.dark-mode #recommendations {
-    background-color: rgba(30, 30, 30, 0.85) !important;
+.card-content { flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+.recipe-title {
+    font-size: 1.05rem; font-weight: 750; margin-top: auto; padding-top: 10px;
+    color: #1d1d1f; text-align: center; cursor: pointer;
 }
 
-/* תפריט הסיידבר מקבל שחור-כלא */
-body.dark-mode .sidebar {
-    background-color: #252525;
-    color: #e0e0e0;
-    border-left: 1px solid #444;
+.recipe-details { display: none; margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(0,0,0,0.05); }
+.recipe-details.show { display: block; }
+.view-recipe-link { color: var(--apple-pink); font-weight: 800; text-decoration: none; font-size: 0.95rem; }
+
+/* 🍹 GLASS SIDEBAR SYSTEM (SCROLLABLE) */
+.sidebar {
+    position: fixed;
+    top: 15px; right: 15px;
+    height: calc(100vh - 30px); /* Fill screen height */
+    width: 340px;
+    background: rgba(255, 255, 255, 0.55); 
+    backdrop-filter: blur(25px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 30px; 
+    padding: 45px 35px 80px 35px; /* 🌟 Bottom padding for scroll clear 🌟 */
+    z-index: 2000;
+    transform: translateX(500px);
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    overflow-y: auto !important; /* 🌟 Guaranteed scroll 🌟 */
+    text-align: left;
+}
+.sidebar.open { transform: translateX(0); }
+
+.sidebar-nav-btn {
+    display: block; width: 100%;
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(0, 0, 0, 0.03);
+    color: #1d1d1f; padding: 16px 22px; border-radius: 16px;
+    margin-bottom: 15px; text-align: left;
+    font-weight: 700; cursor: pointer; transition: all 0.3s;
+}
+.sidebar-nav-btn:hover { background: var(--apple-blue); color: white; transform: translateX(5px); }
+
+.sidebar-section { margin-bottom: 65px; }
+.sidebar-section-label {
+    font-size: 0.72rem; font-weight: 700; color: rgba(0, 0, 0, 0.12);
+    text-transform: uppercase; letter-spacing: 2.8px; display: block; margin-bottom: 18px;
 }
 
-/* צבעי קלט קופסאות חיפוש, יקבלו שחור מאט */
-body.dark-mode input,
-body.dark-mode select {
-    background-color: #333;
-    color: white;
-    border: 1px solid #555;
+/* ❌ CLOSE BUTTONS STANDARDIZED */
+.modal-close-x, #close-sidebar, #close-favorites-btn, #close-register-btn {
+    position: absolute; top: 25px; right: 25px;
+    background: none; border: none;
+    color: rgba(0, 0, 0, 0.15);
+    font-size: 1.7rem; cursor: pointer;
+    transition: all 0.3s; z-index: 2100;
+}
+.modal-close-x:hover, #close-sidebar:hover, #close-favorites-btn:hover, #close-register-btn:hover {
+    color: var(--apple-red); transform: scale(1.2);
 }
 
-/* השחרת כפתורי סיידבר ספציפיים (דורס את העיצוב הלבן שיש ב-HTML) */
-body.dark-mode #home-btn,
-body.dark-mode #favorites-list-btn {
-    background-color: #3b3b3b !important;
-    border-color: #555 !important;
-    color: #e0e0e0 !important;
+/* 🍎 IPHONE TOGGLE SWITCH */
+.toggle-switch { position: relative; display: inline-block; width: 55px; height: 30px; }
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
+.toggle-slider {
+    position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+    background-color: #39393d; transition: .4s; border-radius: 34px;
+}
+.toggle-slider:before {
+    position: absolute; content: ""; height: 26px; width: 26px; left: 2px; bottom: 2px;
+    background-color: white; transition: .4s; border-radius: 50%;
+}
+input:checked + .toggle-slider { background-color: var(--apple-green); }
+input:checked + .toggle-slider:before { transform: translateX(25px); }
+
+/* 🌟 FOOTER (BOTTOM OF FLOW) */
+.footer { 
+    position: relative; margin: 80px 0 40px 0; width: 100%; text-align: center; 
+    color: rgba(0,0,0,0.55); font-weight: 700; z-index: 500; pointer-events: none;
 }
 
-/* השחרת ושכפול כל הטקסטים שהיו בעבר שחורים בכוח - עכשיו יהיו לבנים עדינים */
-body.dark-mode h2, 
-body.dark-mode h3, 
-body.dark-mode h4,
-body.dark-mode p,
-body.dark-mode label,
-body.dark-mode #close-sidebar,
-body.dark-mode #logout-btn,
-body.dark-mode #open-login-sidebar {
-    color: #e0e0e0 !important;
+/* 🌑 DARK MODE THEME */
+body.dark-mode { background-color: #1c1c1e; color: white; }
+body.dark-mode #bg-overlay { background: rgba(0, 0, 0, 0.7); }
+body.dark-mode h1, body.dark-mode .recipe-title { color: white; }
+body.dark-mode .sidebar { background: rgba(28, 28, 30, 0.7); color: white; }
+body.dark-mode .sidebar-nav-btn { background: rgba(255, 255, 255, 0.05); color: white; }
+body.dark-mode .recipe-card { background: rgba(35, 35, 38, 0.85); border-color: rgba(255,255,255,0.05); }
+body.dark-mode .search-bar { background: rgba(44, 44, 46, 0.9); }
+body.dark-mode #search-input { color: white; }
+body.dark-mode .footer { color: rgba(255,255,255,0.4); }
+
+/* 📦 MODALS */
+.modal-overlay {
+    background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(20px);
+    display: none; position: fixed; top:0; left:0; width:100%; height:100%;
+    z-index: 5000; justify-content: center; align-items: center;
 }
+.modal-overlay.show { display: flex !important; }
+
+.login-box, .register-box, .custom-alert-box {
+    background: rgba(255, 255, 255, 0.95); border-radius: 26px; padding: 50px;
+    width: 370px; box-shadow: 0 50px 120px rgba(0,0,0,0.15); position: relative;
+}
+input[type="text"], input[type="password"] {
+    width: 100%; padding: 15px; margin-bottom: 12px; border-radius: 12px;
+    border: 1px solid rgba(0,0,0,0.1); background: rgba(0,0,0,0.03); outline: none;
+}
+#login-btn, #register-btn, #confirm-register-btn {
+    background: linear-gradient(180deg, #00c6ff 0%, #0072ff 100%);
+    color: white; border: none; padding: 16px; border-radius: 16px; width: 100%;
+    font-weight: 700; cursor: pointer; margin-top: 10px;
+}
+
+.favorites-box {
+    background: rgba(255, 255, 255, 0.98); border-radius: 30px;
+    padding: 50px 40px; width: 95%; max-width: 1250px;
+    max-height: 88vh; overflow-y: auto; position: relative;
+}
+#favorites-grid { margin-top: 35px; }

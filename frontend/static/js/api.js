@@ -58,3 +58,14 @@ export async function fetchRecommendations(username) {
 export async function toggleSavedRecipe(recipeDataToSave) {
     return await apiCall('/toggle_recipe', 'POST', recipeDataToSave);
 }
+
+export async function identifyImageFromAPI(imageFile) {
+    const formData = new FormData();
+    formData.append('image', imageFile);
+    // עושים פה fetch ייחודי כי כאן אי אפשר לשלוח JSON, אלא רק FormData פיזי של קבצים
+    const response = await fetch('/api/vision', {
+        method: 'POST',
+        body: formData
+    });
+    return response;
+}

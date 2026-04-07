@@ -5,7 +5,7 @@
  * הוא מייבא את כל הכלים משאר הקבצים ומחבר ביניהם. (מאזיני אירועים - Event Listeners)
  */
 
-import { fetchFavorites, searchRecipes, fetchRecommendations, toggleSavedRecipe, loginUser, registerUser } from './api.js';
+import { fetchFavorites, searchRecipes, fetchRecommendations, toggleSavedRecipe, loginUser, registerUser,identifyImageFromAPI } from './api.js';
 import { isLoggedIn, currentUser, savedRecipeIds, searchTags, login, logout, updateSavedRecipes, addSavedRecipe, removeSavedRecipe, addSearchTag, removeSearchTag, clearSearchTags } from './auth.js';
 import { elements, createRecipeCardHTML, renderChips, showCustomAlert } from './ui.js';
 
@@ -189,6 +189,7 @@ elements.searchInput.addEventListener('keyup', (event) => {
 elements.logoutBtn.addEventListener('click', () => {
     if (isLoggedIn) {
         logout();
+        document.body.classList.remove('logged-in'); // חזרה למצב ללא תוצאות/המלצות
         elements.logoutBtn.style.display = "none";
         elements.userGreeting.style.display = "none";
         elements.favoritesBtn.style.display = "none";
@@ -216,6 +217,7 @@ elements.loginBtn.addEventListener('click', async () => {
 
         if (response.ok) {
             login(username); // קריאה לפונקציית העדכון מ-auth.js
+            document.body.classList.add('logged-in'); // פתיחת אפשרות להציג כרטיסיות
             
             // משיכת מועדפים ישירות מהשרת (כדי לדעת איזה מתכונים נעיצוב הלב אדום)
             // השתמשנו בסוכן ה-Retry שלנו גם כאן כדי לוודא שהתחברות לא "נתקעת" בגלל עומס
@@ -261,6 +263,7 @@ elements.confirmRegisterBtn.addEventListener('click', async () => {
 
         if (response.ok) {
             login(username);
+            document.body.classList.add('logged-in'); // פתיחת אפשרות להציג כרטיסיות
             
 
             elements.userGreeting.innerText = `Hello ${currentUser} 👋`;
@@ -373,6 +376,39 @@ elements.themeToggle.addEventListener('click', () => {
     }
 });
 
+elements.snapBtn.addEventListener('click', () => {
+    elements.cameraInput.click();
+});
+
+elements.cameraInput.addEventListener('change', async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // יוצרים חווית משתמש - הודעה שהמודל קורא את התמונה
+    elements.searchInput.value = "Analyzing... 🤖";
+
+    try {
+        const response = await identifyImageFromAPI(file);
+        const data = await response.json();
+
+        if (data.status === 'success') {
+            elements.searchInput.value = ""; // מחיקת הודעת ההמתנה
+            addSearchTag(data.label); // הקפצת תגית החיפוש הכתומה היפהפייה למסך!
+            renderChips(searchTags); // ציור התגית החדשה על המסך
+        } else {
+            alert("AI Error: " + data.error);
+            elements.searchInput.value = "";
+        }
+    } catch (err) {
+        console.error("Error recognizing image:", err);
+        alert("Failed to analyze image. Is the server running?");
+        elements.searchInput.value = "";
+    }
+
+    // מנקים קובץ קודם כדי שאפשר יהיה להעלות את אותה התמונה שוב במידת הצורך
+    elements.cameraInput.value = "";
+});
+
 // ==========================================
 // פונקציות אתחול - כשהאתר נטען מחדש
 // ==========================================
@@ -402,12 +438,16 @@ async function loadRecommendations() {
         return;
     }
 
-    // אם הכל עבר חלק, נצייר:
+    // אם הכל עבר חלק, נצייר (רק אם יש לפחות המלצה אחת שהגיעה מהעדפות)
+    if (!data || data.length === 0) {
+        elements.recommendationsWrapper.style.display = 'none';
+        return;
+    }
+
     elements.recommendationsGrid.innerHTML = "";
     data.forEach(recipeData => {
-        const isSaved = savedRecipeIds.includes(recipeData.id); // בודק אם כבר עשינו לייק בעבר!
-        const recipeCardHTML = createRecipeCardHTML(recipeData, isSaved, 'recommendation');
-        elements.recommendationsGrid.innerHTML += recipeCardHTML;
+        const isSaved = savedRecipeIds.includes(recipeData.id); 
+        elements.recommendationsGrid.innerHTML += createRecipeCardHTML(recipeData, isSaved, 'recommendation');
     });
     console.log("Recommended recipes loaded securely.");
 }
@@ -417,6 +457,7 @@ async function loadRecommendations() {
 const userFromStorage = localStorage.getItem('savedUser');
 if (userFromStorage) {
     login(userFromStorage);
+    document.body.classList.add('logged-in'); 
 
     elements.openLoginHomeBtn.style.display = "none";
     elements.userGreeting.innerText = `Hello ${currentUser} 👋`;
