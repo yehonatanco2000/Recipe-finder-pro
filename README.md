@@ -17,7 +17,8 @@ This project was built from the ground up to demonstrate a comprehensive underst
 *   **📷 Offline Computer Vision API**: Users can take a picture of an ingredient in their fridge, and the app will identify it using a Zero-Shot classification model (**Hugging Face CLIP**) running *completely locally/offline* to save latency and bandwidth.
 *   **🧠 Machine Learning Recommendations**: Utilizes **TF-IDF Vectorization** and **Cosine Similarity** (`scikit-learn`) to mathmatically cluster the user's saved favorites against massive datasets to provide accurate, personalized recommendations.
 *   **💾 Intelligent Caching Layer**: Heavily mitigates API rate limits by saving raw query results via a custom SQLite3 caching manager, utilizing rapid `REPLACE INTO` statements to ensure fresh data.
-*   **💎 Premium "Glassmorphism" UI with Dark Mode**: An Apple-inspired, responsive user interface built rapidly with pure HTML5, CSS3 Variables, and Vanilla ES6 JavaScript. Includes full native Dark Mode support based on user preference.
+*   **💎 Premium "Glassmorphism" UI with Dark Mode**: An Apple-inspired, user interface built rapidly with pure HTML5, CSS3 Variables, and Vanilla ES6 JavaScript. Includes full native Dark Mode support based on user preference.
+*   **📱 Mobile Responsiveness**: A fully responsive design ensuring a seamless, intuitive, and modern user experience across all mobile devices.
 *   **♿ User-Centric Accessibility**: Advanced filtering engines allow users to strictly navigate recipes by complex dietary restrictions (Vegan, Gluten-Free, Peanut-Free), allergies, and global Cuisine types.
 ## 🏗️ Architecture & Engineering Highlights
 
@@ -66,7 +67,9 @@ This repository represents an intensive, self-taught roadmap. Coming into this p
    ```
    *(Note: The database tables will instantly auto-initialize on the first run, no manual SQL commands are required).*
 5. **Access the application:**
-   Navigate to `http://localhost:5000` in your browser.
+   Navigate to `http://localhost:5000` or `http://127.0.0.1:5000` in your web browser. 
+   
+   > 📱 **Network Access (Mobile Testing):** Because this application runs a heavy `transformers` AI pipeline requiring physical machine hardware, it is currently designed as a localized server rather than a cloud-hosted sandbox. To test the mobile UI, simply open your phone's browser and connect to your host computer's Local IPv4 address on Port 5000 (e.g., `http://192.168.1.X:5000`).
 
 ---
 *Built with ❤️ by Yehonatan Cohen.*
