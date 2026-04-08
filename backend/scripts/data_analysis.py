@@ -3,9 +3,9 @@ import pandas as pd
 import numpy as np
 import os
 
-# 1. חיבור למסד הנתונים הקיים שלנו
-# שימו לב: מכיוון שאנחנו מריצים את הסקריפט הזה מתוך תיקיית scripts, 
-# אנחנו מנווטים הורה אחד אחורה אל תיקיית ה-backend הראשית
+# 1. Connect to our existing database
+# Note: Since we run this script from the scripts folder, 
+# we navigate one parent back to the main backend folder
 db_path = os.path.join(os.path.dirname(__file__), '..', 'recipe_app.db')
 
 try:
@@ -13,40 +13,40 @@ try:
     print("✅ Successfully connected to the App Database!\n")
 
     # ==========================================
-    # --- דוגמה לפנדס (Pandas DataFrame) ---
+    # --- Pandas DataFrame Example ---
     # ==========================================
-    # אנחנו שולפים את כל נתוני המטמון שלנו במכה אחת, והופכים אותם לטבלה מודרנית
+    # We fetch all cache data at once and convert it into a modern table
     print("📊 Loading cache data into Pandas DataFrame...")
     query = "SELECT query, provider_name, timestamp FROM provider_cache"
     df_cache = pd.read_sql_query(query, conn)
 
-    # הצצה על 5 השורות הראשונות בטבלה (כדי לראות שהכל תקין)
+    # Peek at the first 5 rows in the table (to ensure everything is fine)
     print("\n--- First 5 rows of our Cache Data ---")
     print(df_cache.head())
 
-    # עכשיו מגיע הקסם: Pandas Analytics!
-    # אנחנו רוצים לחקור: איזה ספק (provider_name) מספק לנו הכי הרבה חומרי עבודה במטמון?
-    # groupby: אוסף את כל השורות לפי קטגוריה וסופר אותן!
+    # Now comes the magic: Pandas Analytics!
+    # We want to research: which provider gives us the most workspace materials in cache?
+    # groupby: Collects all rows by category and counts them!
     print("\n--- Data Aggregation: Cache Entries grouped by Provider ---")
     provider_counts = df_cache.groupby('provider_name').size()
     print(provider_counts)
 
-    # בוא נשלוף רק את החיפושים שהם 'טבעוניים' (שמכילים את המילה vegan במפתח החיפוש)
+    # Let's fetch only the 'vegan' searches (containing the word vegan in the search query)
     print("\n--- Active Filtering: Only Vegan searches ---")
     vegan_searches = df_cache[df_cache['query'].str.contains('vegan', case=False, na=False)]
     print(vegan_searches)
 
 
     # ==========================================
-    # --- דוגמה ל-NumPy במערכות שלנו ---
+    # --- NumPy Example in our systems ---
     # ==========================================
     print("\n" + "="*30)
     print("🧪 NumPy Academic Example:")
-    # בואו נייצר אראי של כמויות המתכונים שיש לנו אולי ללמוד
+    # Let's generate an array of recipe quantities we might study
     recipe_counts = np.array([10, 20, 15, 0])
     
-    # חישוב מתמטי מידי ווקטורי: אם כל מתכון לוקח 10 דקות להכין,
-    # כמה דקות הכנה כולל יש בבסיס הנתונים שלנו? (נכפיל את המערך ב-10)
+    # Immediate vector math calculation: if each recipe takes 10 minutes to prepare,
+    # How many total prep minutes in our database? (multiply array by 10)
     total_minutes = recipe_counts * 10
     print(f"Base recipe counts: {recipe_counts}")
     print(f"Minutes required to cook them all (Array * 10): {total_minutes}")
@@ -57,6 +57,6 @@ try:
 except Exception as e:
     print(f"❌ Error occurred: {e}")
 finally:
-    # בסוף לא שוכחים לסגור את החיבור!
+    # Don't forget to close the connection at the end!
     if 'conn' in locals():
         conn.close()

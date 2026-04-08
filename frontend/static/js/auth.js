@@ -36,9 +36,9 @@ export function logout() {
  * Updates the global list of favorite recipe IDs (synchronized from the server).
  */
 export function updateSavedRecipes(idsArray) {
-    savedRecipeIds.length = 0; // מחיקה של התוכן הישן
+    savedRecipeIds.length = 0; // Clear old content
     if (idsArray && idsArray.length > 0) {
-        savedRecipeIds.push(...idsArray); // הוספה ישירה של התוכן החדש לאותו מצביע מערך
+        savedRecipeIds.push(...idsArray); // Direct insertion of new content into same array reference
     }
     console.log("Updated savedRecipeIds inside auth.js:", savedRecipeIds);
 }

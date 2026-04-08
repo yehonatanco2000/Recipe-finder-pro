@@ -15,12 +15,12 @@ class TastyProvider(RecipeProvider):
         if not self.api_key:
             logging.error("❌ Tasty API key is missing!")
             return []
-        # שימו לב: הפעם המפתחות הולכים ל-Headers ולא ל-Params!
+        # Note: This time keys go to Headers and not Params!
         headers = {
             "x-rapidapi-key": self.api_key,
             "x-rapidapi-host": self.api_host
         }
-        # פרמטרי החיפוש הולכים ל-Params (query string)
+        # Search parameters go to Params (query string)
         api_params = {
             "from": "0",
             "size": "20",
@@ -37,14 +37,14 @@ class TastyProvider(RecipeProvider):
                     tag_labels.append("gluten_free")
         if tag_labels:
             api_params['tags'] = ','.join(tag_labels)
-        # התעלמנו זמנית מ-cuisine_type כי ל-Tasty יש שיטת תיוג שונה מאוד
+        # Temporarily ignored cuisine_type because Tasty uses a very different tagging method
         try:
             response = requests.get(self.base_url, headers=headers, params=api_params)
 
-            # בדיקת הסטטוס היא קריטית כאן! 429 = עברנו את המכסה (Too Many Requests)
+            # Status check is critical here! 429 = Quota exceeded (Too Many Requests)
             if response.status_code == 429:
                 logging.warning("⚠️ Tasty API Rate Limit Reached! (500/month). Disabling Tasty for now.")
-                return []  # מחזירים ריק כדי שהשאר ימשיכו לעבוד בעצמם
+                return []  # Return empty so the rest continue working independently
 
             if response.status_code != 200:
                 logging.error(f"❌ Tasty API Error: {response.status_code} - {response.text}")
@@ -52,9 +52,9 @@ class TastyProvider(RecipeProvider):
             data = response.json()
             recipes = []
 
-            # Tasty מחזיר הכל ברשימה שנקראת results
+            # Tasty returns everything in a list called results
             for item in data.get('results', []):
-                # לפעמים Tasty מחזיר "לקטים" של סרטונים שאין להם מתכון אמיתי. אנחנו מפלטרים אותם:
+                # Sometimes Tasty returns video compilations without a real recipe. We filter them:
                 if 'name' in item and 'thumbnail_url' in item:
                     recipes.append(self._convert_to_recipe(item))
 
@@ -64,13 +64,13 @@ class TastyProvider(RecipeProvider):
             return []
 
     def _convert_to_recipe(self, item):
-        # ב-Tasty, הקישור למתכון נבנה מה-slug שלהם
+        # In Tasty, the recipe link is built from their slug
         slug = item.get('slug', '')
         recipe_url = f"https://tasty.co/recipe/{slug}" if slug else item.get('original_video_url', '')
         return Recipe(
             id=f"tasty_{item['id']}",
             title=item['name'],
-            image=item.get('thumbnail_url', ''),  # תמונה מגניבה ואיכותית של באזפיד בענן שלא פגת תוקף
+            image=item.get('thumbnail_url', ''),  # Cool high-quality Buzzfeed cloud image that doesn't expire
             url=recipe_url,
             source=self.name
         )

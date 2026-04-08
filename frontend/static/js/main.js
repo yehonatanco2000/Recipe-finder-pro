@@ -1,36 +1,36 @@
 // frontend/js/main.js
 
 /**
- * קובץ הבוס הגדול. זהו הקובץ שמוגדר ב-HTML כ- <script type="module" src="...">
- * הוא מייבא את כל הכלים משאר הקבצים ומחבר ביניהם. (מאזיני אירועים - Event Listeners)
+ * The main boss file. This is defined in HTML as <script type="module" src="...">
+ * It imports all tools from remaining files and connects them. (Event Listeners)
  */
 
-import { fetchFavorites, searchRecipes, fetchRecommendations, toggleSavedRecipe, loginUser, registerUser,identifyImageFromAPI } from './api.js';
+import { fetchFavorites, searchRecipes, fetchRecommendations, toggleSavedRecipe, loginUser, registerUser, logoutUser, identifyImageFromAPI } from './api.js';
 import { isLoggedIn, currentUser, savedRecipeIds, searchTags, login, logout, updateSavedRecipes, addSavedRecipe, removeSavedRecipe, addSearchTag, removeSearchTag, clearSearchTags } from './auth.js';
 import { elements, createRecipeCardHTML, renderChips, showCustomAlert } from './ui.js';
 
 
-// כלי עזר מודרני: פונקציית "השהייה" שעוצרת את הקוד אבל לא מקפיאה את המסך (Promise-based sleep)
+// Modern utility: 'delay' function that pauses code without freezing the screen (Promise-based sleep)
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-// הסוכן החכם הכללי שיודע להריץ כל פעולה שהוא מקבל, ולנסות שוב בעת עומס!
+// General smart agent that runs given actions and retries during overload!
 async function fetchWithDynamicRetry(apiAction, messageElement, retryCount = 0) {
     if (retryCount > 0) {
         messageElement.innerHTML = `<p style="grid-column: 1 / -1; color: #ff9800; text-align: center; width:100%;">Heavy traffic. Retrying... (Attempt ${retryCount}/3) ⏳</p>`;
     }
 
     try {
-        const response = await apiAction(); // מפעיל את הפעולה (apiAction) שהעברנו לו בסוגריים!
+        const response = await apiAction(); // Executes the passed action (apiAction)!
         const data = await response.json();
 
-        // מזהה אך ורק אם יש עומס אמיתי בשרת, ולא כל שגיאה כללית!
+        // Identifies strictly genuine server overloads, not general errors!
         if ((data.status === "error" && data.message === "Limits exceeded") || 
             data.error === "Failed to generate recommendations" || 
             data.error === "Failed to fetch recipes" ||
             data.error === "Failed to fetch fresh favorites") {
             if (retryCount < 3) {
                 messageElement.innerHTML = `<p style="grid-column: 1 / -1; color: #ff9800; text-align: center; width:100%;">Server is busy! Waiting 15 seconds... (Attempt ${retryCount + 1}/3) 🕒</p>`;
-                await delay(15000); //  עוצר את הקוד כאן ל-15 שניות באופן קליל ואסינכרוני!
+                await delay(15000); // Lightweight asynchronous code pause for 15 seconds!
                 return await fetchWithDynamicRetry(apiAction, messageElement, retryCount + 1);
             } else {
                 messageElement.innerHTML = "<p style='grid-column: 1 / -1; color: #ff6b6b; text-align: center; width:100%;'>Servers are too busy right now. Please try again later. ❌</p>";
@@ -38,7 +38,7 @@ async function fetchWithDynamicRetry(apiAction, messageElement, retryCount = 0) 
             }
         }
 
-        return data; // הצליח להביא תוצאות נקיות!
+        return data; // Successfully fetched clean results!
 
     } catch (error) {
         console.error("Fetch error:", error);
@@ -50,13 +50,13 @@ async function fetchWithDynamicRetry(apiAction, messageElement, retryCount = 0) 
 
 
 // ==========================================
-// 🚀 טריק מקצוענים: דריסת פונקציית ה-alert המובנית בכל הדפדפן 🚀
-// כל פעם שקוד כלשהו שלנו יקרא ל- alert("משהו") מעכשיו - הוא בעצם יקרא למודאל המעוצב!
+// 🚀 Pro trick: Overriding the browser's built-in alert function 🚀
+// Anytime our code calls alert('something') from now on - it'll call the custom UI modal!
 window.alert = function(msg) {
     showCustomAlert(msg);
 };
 
-// מאזין לאירוע הלחיצה על "הבנתי" כדי לסגור את חלון ההתראה הקופץ
+// Listens to 'Got it' click event to close the popup alert modal
 if (elements.closeAlertBtn) {
     elements.closeAlertBtn.addEventListener('click', () => {
         elements.customAlertModal.classList.remove('show');
@@ -64,9 +64,9 @@ if (elements.closeAlertBtn) {
 }
 
 // ==========================================
-// חיבור פונקציות לסביבה העולמית (window)
-// הסיבה: בגלל המעבר למודולים הפונקציות לא זמינות באופן אוטומטי מה-HTML ל-JS (למשל: onclick)
-// 🧹 פונקציה מסודרת לניקוי המסך ומעבר למצב התחלתי נקי (Home State)
+// Connecting functions to the global environment (window)
+// Reason: Module isolation means functions aren't automatically available in HTML (e.g: onclick)
+// 🧹 Organized function to clear the screen and transition to a clean Home State
 function resetToHomeState() {
     elements.resultsContainer.innerHTML = "";
     elements.searchMessage.innerHTML = "";
@@ -104,7 +104,7 @@ window.toggleSave = async function(button, recipeId) {
     }
 
     const card = button.closest('.recipe-card');
-    // עכשיו כל הכותרות משתמשות באותו קלאס, אז קל מאוד למצוא אותן!
+    // Now all titles use the same class, making them easy to select!
     const recipeTitle = card.querySelector('.recipe-title').innerText;
     const recipeImage = card.querySelector('img').src;
     const recipeUrl = card.querySelector('.recipe-details a').href;
@@ -128,14 +128,14 @@ window.toggleSave = async function(button, recipeId) {
                 button.innerText = '🤍';
                 removeSavedRecipe(recipeId);
                 
-                // אם אנחנו בתוך מודאל המועדפים, נסיר את הכרטיסייה פיזית מהמסך מיד!
+                // If inside favorites modal, immediately remove the card element physically from screen!
                 if (button.closest('#favorites-grid')) {
                     card.style.opacity = '0';
                     setTimeout(() => card.remove(), 300); 
                 }
             }
             
-            // 🚀 סנכרון לבבות: מעדכן את כל המקומות שבהם המתכון הזה מופיע (בחיפוש ובהמלצות)
+            // 🚀 Heart synchronization: Update all locations where this recipe appears (search / recommendations)
             const allSameHearts = document.querySelectorAll(`button[onclick*='${recipeId}']`);
             allSameHearts.forEach(h => h.innerText = (data.action === "saved" ? '❤️' : '🤍'));
 
@@ -150,14 +150,14 @@ window.toggleSave = async function(button, recipeId) {
 };
 
 // ==========================================
-// הוספת מאזיני אירועים (Event Listeners)
+// Attaching Event Listeners
 // ==========================================
 
-// פתיחה/סגירה תפריט צד
+// Open/Close sidebar menu
 elements.menuButton.addEventListener('click', () => elements.sidebar.classList.add('open'));
 elements.closeButton.addEventListener('click', () => elements.sidebar.classList.remove('open'));
 
-// כפתור "בית" - מחזיר אותנו למצב נקי בלי לרענן את הדף
+// 'Home' button - returns logically to clean state without refreshing page
 elements.homeBtn.addEventListener('click', resetToHomeState);
 
 
@@ -166,20 +166,20 @@ elements.openLoginHomeBtn.addEventListener('click', () => {
 });
 elements.closeModalBtn.addEventListener('click', () => elements.loginModal.classList.remove('show'));
 
-// מודאל הרשמה
+// Registration modal
 elements.registerBtn.addEventListener('click', () => {
     elements.loginModal.classList.remove('show');
     elements.registerSection.classList.add('show');
 });
 
-// סגירת חלון מועדפים
+// Close favorites window
 elements.closeFavoritesBtn.addEventListener('click', () => elements.favoritesModal.classList.remove('show'));
 
-// הוספת מצרכים (תגיות) בחיפוש בעזרת פסיק
+// Adding ingredients (tags) to search using comma delimiter
 elements.searchInput.addEventListener('keyup', (event) => {
     if (event.key === ',') {
         let inputValue = elements.searchInput.value.replace(',', '').trim();
-        // מוודאים שאפשר להוסיף את התגית (שלא ריקה ולא קיימת כבר)
+        // Ensure tag can be added (not empty and doesn't exist)
         if (addSearchTag(inputValue)) {
             renderChips(searchTags);
         }
@@ -187,16 +187,19 @@ elements.searchInput.addEventListener('keyup', (event) => {
     }
 });
 
-// התנתקות משתמש
-elements.logoutBtn.addEventListener('click', () => {
+// User logout
+elements.logoutBtn.addEventListener('click', async () => {
     if (isLoggedIn) {
+        await logoutUser(currentUser);
         logout();
-        document.body.classList.remove('logged-in'); // חזרה למצב ללא תוצאות/המלצות
+        document.body.classList.remove('logged-in'); // Revert to initial state without results/recommendations
         elements.logoutBtn.style.display = "none";
         elements.userGreeting.style.display = "none";
         elements.favoritesBtn.style.display = "block";
         elements.openLoginHomeBtn.style.display = "block";
         elements.resultsContainer.innerHTML = "";
+        clearSearchTags();
+        renderChips([]);
         elements.searchMessage.innerHTML = "";
         elements.sidebar.classList.remove('open');
         elements.searchInput.value = "";
@@ -205,7 +208,7 @@ elements.logoutBtn.addEventListener('click', () => {
     }
 });
 
-// כפתור התחברות
+// Login button
 elements.loginBtn.addEventListener('click', async () => {
     const username = elements.usernameInput.value.trim();
     const password = elements.passwordInput.value;
@@ -222,18 +225,18 @@ elements.loginBtn.addEventListener('click', async () => {
         const data = await response.json();
 
         if (response.ok) {
-            login(username); // קריאה לפונקציית העדכון מ-auth.js
-            document.body.classList.add('logged-in'); // פתיחת אפשרות להציג כרטיסיות
+            login(username); // Call update function from auth.js
+            document.body.classList.add('logged-in'); // Unlock ability to display cards
             
-            // משיכת מועדפים ישירות מהשרת (כדי לדעת איזה מתכונים נעיצוב הלב אדום)
-            // השתמשנו בסוכן ה-Retry שלנו גם כאן כדי לוודא שהתחברות לא "נתקעת" בגלל עומס
+            // Fetch favorites directly from server (to know which recipe hearts to color red)
+            // We use our Retry agent here to ensure login doesn't 'hang' due to load
             const favData = await fetchWithDynamicRetry(() => fetchFavorites(username), elements.resultsContainer); 
             
             if (favData && Array.isArray(favData)) {
                 updateSavedRecipes(favData.map(fav => fav.id));
             }
             
-            // החזרת הכפתור למצבו המקורי רק לאחר שכל נתוני הרקע נטענו (המועדפים)
+            // Restoring button original state only after all background data is loaded (favorites)
             elements.loginBtn.innerHTML = originalBtnText;
             elements.loginBtn.style.pointerEvents = 'auto';
 
@@ -261,7 +264,7 @@ elements.loginBtn.addEventListener('click', async () => {
     }
 });
 
-// כפתור ביצוע הרשמה
+// Execute Registration button
 elements.confirmRegisterBtn.addEventListener('click', async () => {
     const username = elements.registerUsernameInput.value.trim();
     const password = elements.registerPasswordInput.value;
@@ -276,7 +279,7 @@ elements.confirmRegisterBtn.addEventListener('click', async () => {
 
         if (response.ok) {
             login(username);
-            document.body.classList.add('logged-in'); // פתיחת אפשרות להציג כרטיסיות
+            document.body.classList.add('logged-in'); // Unlock ability to display cards
             
 
             elements.userGreeting.innerText = `Hello ${currentUser} 👋`;
@@ -302,7 +305,7 @@ elements.confirmRegisterBtn.addEventListener('click', async () => {
     }
 });
 
-// צפייה במועדפים
+// View Favorites
 elements.favoritesBtn.addEventListener('click', async () => {
     if (!isLoggedIn) return alert('Please log in to view your favorites!');
     
@@ -313,10 +316,10 @@ elements.favoritesBtn.addEventListener('click', async () => {
 
     const data = await fetchWithDynamicRetry(() => fetchFavorites(currentUser), elements.favoritesGrid);
 
-    if (!data) return; // השעון או השגיאה כבר הודפסו בגריד על ידי הסוכן
+    if (!data) return; // Loading state or error was already printed in grid by agent
     elements.favoritesGrid.innerHTML = "";
 
-    // הגנה: אם קיבלנו אובייקט עם שגיאה במקום מערך (בגלל שהסוכן סיים בלי הצלחה), פשוט נצא
+    // Guard clauses: if we got an error object instead of array (agent failed), just exit
     if (!data || !Array.isArray(data)) return;
 
     if (data.length === 0) {
@@ -324,19 +327,19 @@ elements.favoritesBtn.addEventListener('click', async () => {
         return;
     }
 
-    // שימוש בפונקציה שלנו מה-UI. בנינו כאן פונקציונליות מיוחדת לעיצוב המועדפים:
+    // Utilizing our UI function. Specific functionality designed here for favorites:
     data.forEach(favRecipe => {
         elements.favoritesGrid.innerHTML += createRecipeCardHTML(favRecipe, true, 'favorite');
     });
 });
 
-// לחצן חיפוש
+// Search button
 elements.searchButton.addEventListener('click', async () => {
-    let selectedHealthLabels = []; // איפוס סינון תוויות בריאות בכל חיפוש מחדש
+    let selectedHealthLabels = []; // Reset health label filter on new search
     if (elements.searchInput.value.trim() !== "") {
         addSearchTag(elements.searchInput.value.trim());
         elements.searchInput.value = "";
-        renderChips(searchTags); // הוספתי בשבילך! זה היה הפקשוש - בלי השורה הזו הקוד זוכר את המילה אבל שוכח לצייר אותה
+        renderChips(searchTags); // Render missing UI chip! Avoids array memory state mismatch
     }
     
     if (searchTags.length === 0) {
@@ -351,17 +354,17 @@ elements.searchButton.addEventListener('click', async () => {
     elements.sidebar.classList.remove('open');
     elements.resultsContainer.innerHTML = "";
     elements.searchMessage.innerHTML = "<p>Loading recipes... ⏳</p>";
-    elements.recommendationsWrapper.style.display = 'none'; // מיד כשלוחצים חיפוש, מנקים המלצות מהמסך
+    elements.recommendationsWrapper.style.display = 'none'; // Clear recommendations from screen instantly upon search
     let cuisine = elements.cuisineSelect.value;
 
-    // מפעילים את כלי העזר הכללי שלנו! שולחים לו מה לעשות (החיפוש) ואיפה לגרף הודעות
+    // Activate our general utility agent! Pass it the task (search request) and target grid for messages
     const data = await fetchWithDynamicRetry(() => searchRecipes(ingredientsStr, cuisine,selectedHealthLabels), elements.searchMessage);
 
-   // אם הסוכן החזיר חלל ריק (null), סימן שהוא נכשל גם אחרי 3 ניסיונות!
-    // ואז אנחנו פשוט יוצרים החוצה, הוא כבר הדפיס את התקלה במסך.
+   // If agent returned null, it means it failed even after 3 attempts!
+    // Then we just exit out, it already logged the error on screen.
     if (!data) return;
 
-    // -- אם הגענו לכאן - יש תשובה נכונה! רגיל --
+    // -- If reached here - correct response! Output standard --
     elements.searchMessage.innerHTML = "";
     const recipesList = data;
     if (!recipesList || recipesList.length === 0) {
@@ -373,7 +376,7 @@ elements.searchButton.addEventListener('click', async () => {
 
     recipesList.forEach(item => {
         const recipeData = item;
-        // ממיר גם את מזהי המועדפים וגם את מזהה המתכון למחרוזות כדי למנוע פערי סוג נתונים עקב ספקי API שונים
+        // Cast both favorite IDs and recipe ID to strings to prevent strictly typed mismatch due to distinct API providers
         const isSaved = savedRecipeIds.some(savedId => String(savedId).trim() === String(recipeData.id).trim());
         elements.resultsContainer.innerHTML += createRecipeCardHTML(recipeData, isSaved, 'search');
     });
@@ -397,7 +400,7 @@ elements.cameraInput.addEventListener('change', async (event) => {
     const file = event.target.files[0];
     if (!file) return;
 
-    // יוצרים חווית משתמש - הודעה שהמודל קורא את התמונה
+    // Creates user experience - notification that model is reading image
     elements.searchInput.value = "Analyzing... 🤖";
 
     try {
@@ -405,9 +408,9 @@ elements.cameraInput.addEventListener('change', async (event) => {
         const data = await response.json();
 
         if (data.status === 'success') {
-            elements.searchInput.value = ""; // מחיקת הודעת ההמתנה
-            addSearchTag(data.label); // הקפצת תגית החיפוש הכתומה היפהפייה למסך!
-            renderChips(searchTags); // ציור התגית החדשה על המסך
+            elements.searchInput.value = ""; // Clear loading message
+            addSearchTag(data.label); // Pop the beautiful orange search tag to screen!
+            renderChips(searchTags); // Render new tag directly on screen
         } else {
             alert("AI Error: " + data.error);
             elements.searchInput.value = "";
@@ -418,40 +421,40 @@ elements.cameraInput.addEventListener('change', async (event) => {
         elements.searchInput.value = "";
     }
 
-    // מנקים קובץ קודם כדי שאפשר יהיה להעלות את אותה התמונה שוב במידת הצורך
+    // Clear previous file value so identical image can be uploaded twice physically
     elements.cameraInput.value = "";
 });
 
 // ==========================================
-// פונקציות אתחול - כשהאתר נטען מחדש
+// Initialization functions - executed on site reload
 // ==========================================
 
 async function loadRecommendations() {
     if (!currentUser) return;
     
-    // אם אין מועדפים, נעלים מייד את הבלוק ולא נעשה כלום
+    // If no favorites, instantly hide block and halt execution
     if (savedRecipeIds.length === 0) {
         elements.recommendationsWrapper.style.display = 'none';
         return;
     }
 
-    // אנו מציגים את הקובייה לפני שיש תוכן רק בתנאי שאין חיפוש באמצע המסך,
-    // ומדפיסים הודעה שיודעת לתת לחיווי (פדרג/המתנה)
+    // Make wrapper visible pre-content ONLY if no active search is populating center block,
+    // and render specific UI loader notification status indicators
     if (elements.resultsContainer.innerHTML.trim() === "") {
         elements.recommendationsWrapper.style.display = 'block';
     }
 
     elements.recommendationsGrid.innerHTML = "<p style='grid-column: 1 / -1; color: white; text-align: center; width: 100%;'>Fetching your personal top picks... ⏳</p>";
 
-    // הנה הסוכן נכנס גם לכאן! הפעם שולחים לו את בסיס ההמלצות, ואת לוח הגריד כבמת ההודעות
+    // The agent steps in here too! Pass it the recommendations request, and the specific grid as message stage
     const data = await fetchWithDynamicRetry(
         () => fetchRecommendations(currentUser),
         elements.recommendationsGrid
     );
 
-    if (!data) return; // השעון או השגיאה כבר הודפסו בגריד על ידי הסוכן
+    if (!data) return; // Loading state or error was already printed in grid by agent
     
-    // אם זו שגיאה טבעית של "משתמש חדש בלי מועדפים", נעלים את הקובייה לחלוטין כמו פעם ונסיים
+    // For 'new user without favorites' natural error, hide the block entirely per standard behavior
     if (data.error || data.length === 0) {
         elements.recommendationsWrapper.style.display = 'none';
         return;
@@ -466,7 +469,7 @@ async function loadRecommendations() {
 }
 
 
-// שחזור מצב תצוגה (לילה/יום)
+// Restore display mode (Dark/Light)
 if (localStorage.getItem('darkMode') === 'enabled') {
     document.body.classList.add('dark-mode');
     elements.themeToggle.checked = true;
@@ -474,7 +477,7 @@ if (localStorage.getItem('darkMode') === 'enabled') {
     elements.themeToggle.checked = false;
 }
 
-// שחזור משתמש מהכספת בטעינת העמוד (אם כבר התחברנו בעבר)
+// Restore authenticated user from vault (localStorage) upon page load (if logged in)
 const userFromStorage = localStorage.getItem('savedUser');
 if (userFromStorage) {
     login(userFromStorage);
@@ -486,14 +489,14 @@ if (userFromStorage) {
     elements.logoutBtn.style.display = "block";
     elements.favoritesBtn.style.display = "block";
 
-    // מעדכנים את מערך המתכונים השמורים שלנו כדי לדעת איזה לב לעשות אדום
+    // Update our cached saved recipes array globally so UI hearts accurately render red
     fetchFavorites(currentUser)
         .then(res => res.json())
         .then(data => {
             if (data && Array.isArray(data)) {
                 updateSavedRecipes(data.map(fav => fav.id));
             }
-            // אחרי שרשימת המועדפים עודכנה בהצלחה, זה הזמן הבטוח לקרוא להמלצות
+            // After favorites successful sync update, it is completely safe to call recommendations trigger
             loadRecommendations();
         })
         .catch(err => console.error("Could not fetch favorites on load", err));

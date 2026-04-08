@@ -1,8 +1,8 @@
 // frontend/js/ui.js
 
 /**
- * קובץ זה אחראי על ה-User Interface (UI).
- * הוא שומר את כל חיפושי האלמנטים ב-HTML (document.getElementById)
+ * This file is responsible for the User Interface (UI).
+ * It stores all HTML element queries (document.getElementById)
  */
 
 export const elements = {
@@ -59,7 +59,7 @@ export function showCustomAlert(msg) {
 export function createRecipeCardHTML(recipeData, isSaved, viewType) {
     let heartIcon = isSaved ? '❤️' : '🤍';
     
-    // בסיס הכרטיסייה - נשתמש במבנה אחיד ומקצועי
+    // Card layout baseline - implement professional uniform structure
     const caloriesHTML = recipeData.calories ? `<p class="recipe-calories">🔥 ${Math.round(recipeData.calories)} kcal</p>` : '';
     
     return `

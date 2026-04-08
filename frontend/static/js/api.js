@@ -1,18 +1,18 @@
 // frontend/js/api.js
 
 /**
- * קובץ זה אחראי אך ורק על ביצוע הקריאות לשרת (Backend).
- * בנינו פונקציות מסודרות כדי שלא נצטרך לרשום fetch בכל פעם מחדש.
+ * This file is strictly responsible for executing server requests (Backend).
+ * We built organized functions so we don't have to rewrite fetch every time.
  */
 
 import { BASE_URL } from './config.js';
 
 /**
- * פונקציית פנימית לביצוע קריאות לשרת כדי למנוע חזרה על קוד ('DRY')
- * @param {string} endpoint - הנתיב לשרת (לדוגמה: '/login')
- * @param {string} method - סוג הבקשה (GET, POST וכו')
- * @param {object} bodyData - נתונים לשליחה בבקשות POST (אופציונלי)
- * @returns {Promise<Response>} - מחזירה את התשובה מהשרת
+ * Internal function for executing server requests to prevent code repetition ('DRY')
+ * @param {string} endpoint - The server path (e.g., '/login')
+ * @param {string} method - Request method (GET, POST etc.)
+ * @param {object} bodyData - Data to send in POST requests (optional)
+ * @returns {Promise<Response>} - Returns the server's response
  */
 async function apiCall(endpoint, method = 'GET', bodyData = null) {
     const options = {
@@ -22,17 +22,17 @@ async function apiCall(endpoint, method = 'GET', bodyData = null) {
         }
     };
     
-    // אם יש מידע לשלוח (כמו ב-Login/Register/Save), נוסיף אותו
+    // Add data if there is info to send (like in Login/Register/Save)
     if (bodyData) {
         options.body = JSON.stringify(bodyData);
     }
     
-    // מחזירים את אובייקט ה-Response כמו שהוא, כדי ש-main.js יוכל לבדוק אם if(response.ok)
+    // Return the raw Response object, so main.js can check if(response.ok)
     return await fetch(`${BASE_URL}${endpoint}`, options);
 }
 
 // ----------------------------------------------------
-// ייצוא כל הפונקציות שאנחנו חושפים לקבצים האחרים
+// Export all functions exposed to other files
 // ----------------------------------------------------
 
 export async function loginUser(username, password) {
@@ -41,6 +41,10 @@ export async function loginUser(username, password) {
 
 export async function registerUser(username, password) {
     return await apiCall('/register', 'POST', { username, password });
+}
+
+export async function logoutUser(username) {
+    return await apiCall('/logout', 'POST', { username });
 }
 
 export async function fetchFavorites(username) {
@@ -62,7 +66,7 @@ export async function toggleSavedRecipe(recipeDataToSave) {
 export async function identifyImageFromAPI(imageFile) {
     const formData = new FormData();
     formData.append('image', imageFile);
-    // עושים פה fetch ייחודי כי כאן אי אפשר לשלוח JSON, אלא רק FormData פיזי של קבצים
+    // Unique fetch here since we cannot send JSON, only physical FormData for files
     const response = await fetch('/api/vision', {
         method: 'POST',
         body: formData

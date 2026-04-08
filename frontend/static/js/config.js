@@ -1,10 +1,10 @@
 // frontend/js/config.js
 
 /**
- * קובץ הגדרות למערכת הלקוח (Frontend)
- * כאן נשמור משתני סביבה כמו כתובת השרת
- * בעתיד, אם נעלה את האתר לשרת אמיתי, נצטרך לשנות את הכתובת רק פה!
+ * Configuration file for the Client system (Frontend)
+ * Environment variables like server address are stored here
+ * In the future, if deploying to a live server, we'll only need to update the address here!
  */
 
-// כתובת השרת הדינמית (עובד מדהים גם ממחשב וגם מהמובייל)
+// Dynamic server address (works amazingly from both desktop and mobile)
 export const BASE_URL = '/api';

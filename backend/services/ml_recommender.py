@@ -21,15 +21,15 @@ def calculate_best_match(user_profile,user_profile_list ,candidates_data):
             unknown_recipes.append(recipe)
     for recipe in unknown_recipes:
         corpus.append(recipe.title)
-    # 1. קוראים לרובוט שיודע לעשות את המתמטיקה של המילים
+    # 1. Call the engine that knows how to do word math
     vectorizer = TfidfVectorizer()
 
-    # 2. נותנים לו את הרשימה שלנו (corpus) כדי שיבנה את הטבלה
+    # 2. Give it our list (corpus) to build the table
     tfidf_matrix = vectorizer.fit_transform(corpus)
-    # 3. מחשבים את הדמיון (הציונים) בין המשתמש (0) לבין כל שאר המתכונים (מ-1 והלאה)
+    # 3. Calculate the similarity (scores) between the user (0) and all other recipes (from 1 onwards)
     similarity_scores = cosine_similarity(tfidf_matrix[0:1], tfidf_matrix[1:])
-    # המשתנה הזה מכיל רשימה של ציונים (מאפס עד אחד)
-    # נשטח אותו לרשימה רגילה כדי שיהיה קל לקרוא
+    # This variable contains a list of scores (zero to one)
+    # Flatten it to a standard list for easier reading
     scores_list = similarity_scores[0]
     top_3_recipe_index = scores_list.argsort()[-3:][::-1]
     best_3_recipes = []

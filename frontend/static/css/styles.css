@@ -95,6 +95,9 @@ h1 {
     letter-spacing: -2px;
     color: var(--text-light);
     text-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 /* 🔍 SEARCH BAR SYSTEM */

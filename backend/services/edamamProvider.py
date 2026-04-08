@@ -16,7 +16,7 @@ class EdamamProvider(RecipeProvider):
 
     def search(self,query,cuisine_type=None,health_labels=None):
 
-        # 2. אריזת הנתונים למילון
+        # 2. Pack the data into a dictionary
         api_params = {
             'type': 'public',
             'q': query,
@@ -30,12 +30,12 @@ class EdamamProvider(RecipeProvider):
             api_params['cuisineType'] = cuisine_type
 
         try:
-            # 3. ביצוע הפנייה לשרת החיצוני
+            # 3. Execute request to the external server
             response = requests.get(self.base_url, params=api_params)
             data = response.json()
             if response.status_code != 200:
                 logging.error(f"❌ Edamam API Error: {response.text}")
-                return []  # במקרה של שגיאה נחזיר 'כלום'
+                return []  # Return empty on error
 
             recipes = []
             for hit in data['hits']:
@@ -57,7 +57,7 @@ class EdamamProvider(RecipeProvider):
         )
 
     def get_recipes_by_uris(self,uri_list):
-        """שליפת מתכונים מאדמם לפי רשימת URIs. תומך בפיצול לבקשות של 20 (מגבלת אדמם)"""
+        """Fetch recipes from Edamam by URI list. Supports splitting into requests of 20 (Edamam limit)"""
         if not uri_list:
             return []
 
@@ -67,7 +67,7 @@ class EdamamProvider(RecipeProvider):
 
         for i in range(0, len(uri_list), 20):
             chunk = uri_list[i:i + 20]
-            time.sleep(3)  # הוספת השהייה גדולה יותר (3 שניות) למניעת חסימת Burst מאדמם
+            time.sleep(3)  # Add larger delay (3 seconds) to prevent Edamam Burst block
             api_params = {
                 'type': 'public',
                 'app_id': self.app_id,

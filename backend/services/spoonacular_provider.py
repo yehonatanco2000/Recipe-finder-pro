@@ -16,9 +16,9 @@ class SpoonacularProvider(RecipeProvider):
             return []
         api_params = {
             'apiKey': self.api_key,
-            'includeIngredients': query,  # שינוי קטן בשם הפרמטר לעומת אדמם
-            'addRecipeInformation': 'true',  # פקודת קסם כדי לקבל את ה-URL
-            'number': 20 # נבקש עד 20 תוצאות
+            'includeIngredients': query,  # Small param name change compared to Edamam
+            'addRecipeInformation': 'true',  # Magic command to get the URL
+            'number': 20 # Request up to 20 results
         }
         diet_labels = []
         intolerance_labels = []
@@ -57,9 +57,9 @@ class SpoonacularProvider(RecipeProvider):
         if "-312x231" in image_url:
             image_url = image_url.replace("-312x231", "-636x393")
         return Recipe(
-            id=f"spoonacular_{item['id']}",  # שומרים על התקן שלנו! קידומת + מזהה
+            id=f"spoonacular_{item['id']}",  # Keep our standard! Prefix + ID
             title=item['title'],
             image=image_url,
-            url=item.get('sourceUrl', ''),  # במקרה חריג שאין, נחזיר ריק
+            url=item.get('sourceUrl', ''),  # In rare cases if missing, return empty
             source=self.name
         )

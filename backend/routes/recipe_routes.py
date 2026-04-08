@@ -8,23 +8,23 @@ recipe_bp = Blueprint('recipe', __name__)
 
 @recipe_bp.route('/api/search')
 def search_recipes():
-    # 1. קליטת המצרכים מהדפדפן
-    # אנחנו שולפים את מה שהמשתמש הקליד מתוך הכתובת
+    # 1. Extracting ingredients from the browser
+    # We extract what the user typed from the URL
     user_ingredients = request.args.get('ingredients')
     logging.info(f"🔍 Received search request with ingredients: {user_ingredients}")
     user_cuisine_type = request.args.get('cuisine')
     health_labels = request.args.get('selectedHealthLabels')
     if health_labels:
-        health_labels = health_labels.split(",")  # המרת מחרוזת לרשימה
+        health_labels = health_labels.split(",")  # Convert string to list
     else:
         health_labels = []
 
-    # הגנת שרת: אם לא שלחו לנו מצרכים, נחזיר הודעת שגיאה
+    # Server protection: if no ingredients were sent, return an error message
     if not user_ingredients:
         logging.warning("⚠️ Search request missing 'ingredients' parameter.")
         return jsonify({"error": "Please provide ingredients"}), 400
 
-    # 1. שולחים את השליח שלנו (הפונקציה מהקובץ השני) שיביא את הנתונים
+    # 1. Send our agent (function from the other file) to fetch the data
     manager = RecipeManager()
     recipes = manager.search_all(user_ingredients, user_cuisine_type, health_labels)
     recipes_data = [recipe.to_dict() for recipe in recipes]
@@ -54,7 +54,7 @@ def get_favorites():
         return jsonify([]), 200
 
     edamam_uris = []
-    edamam_fallbacks = {}  # כאן אנחנו מגדירים את המילון הריק!
+    edamam_fallbacks = {}  # Initialize the empty dictionary here!
     final_favorites = []
     for row in saved_rows:
         recipe_id, recipe_title, recipe_image, recipe_url = row
@@ -62,9 +62,9 @@ def get_favorites():
             r = Recipe(id=recipe_id, title=recipe_title, image=recipe_image, url=recipe_url, source="database")
             final_favorites.append(r.to_dict())
         else:
-            # זה מתכון של אדמם. נכין אותו לריענון:
+            # This is an Edamam recipe. Prepare it for refresh:
             edamam_uris.append(recipe_id)
-            # ונכין לו מצנח גיבוי (במקרה שאדמם חוסם אותנו כרגע)
+            # And prepare a fallback (in case Edamam blocks us right now)
             edamam_fallbacks[recipe_id] = Recipe(id=recipe_id, title=recipe_title, image=recipe_image,
                                                          url=recipe_url, source="database_fallback")
 
@@ -73,19 +73,19 @@ def get_favorites():
         edamam_recipes = edamam_provider.get_recipes_by_uris(edamam_uris)
 
         if edamam_recipes is None:
-            edamam_recipes = []  # הגנה נוספת
+            edamam_recipes = []  # Extra protection
 
-        # ניקח את כל התעודות זהות שאדמם באמת החזיר לנו (מחוץ ל-if!)
+        # Take all the IDs that Edamam actually returned (outside the if!)
         returned_ids = {r.id for r in edamam_recipes}
 
-        # עכשיו נעבור על כל מה שביקשנו ממנו במקור:
+        # Now iterate over everything we originally requested:
         for uri in edamam_uris:
             if uri in returned_ids:
-                # אדמם החזיר את זה בהצלחה!
+                # Edamam returned this successfully!
                 recipe = next(r for r in edamam_recipes if r.id == uri)
                 final_favorites.append(recipe.to_dict())
             else:
-                # השגיאה שלך תפסה פה: אדמם כשל או חסם את הבקשה. אנחנו מפעילים את המצנח מתוך ה-Database!
+                # Your error caught here: Edamam failed or blocked the request. Triggering fallback from the Database!
                 logging.warning(f"⚠️ Edamam failed to fetch fresh data for {uri}. Using database fallback.")
                 final_favorites.append(edamam_fallbacks[uri].to_dict())
 

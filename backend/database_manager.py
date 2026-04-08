@@ -10,13 +10,13 @@ from datetime import datetime, timedelta
 class DatabaseManager:
     def __init__(self):
         self.db_path = DATABASE_PATH
-        self.connection = sqlite3.connect(self.db_path, check_same_thread=False)  # מאפשר חיבור משותף בין תהליכים שונים
+        self.connection = sqlite3.connect(self.db_path, check_same_thread=False)  # Allows shared connection among threads
 
 
     def init_db(self):
         cursor = self.connection.cursor()
 
-        # 2. פקודת SQL: יצירת טבלת משתמשים (רק אם היא לא קיימת כבר!)
+        # 2. SQL command: Create users table (only if it doesn't already exist!)
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS users (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -45,7 +45,7 @@ class DatabaseManager:
             )
         ''')
 
-        # 3. חותמת (שמירת השינויים) וסגירת החיבור
+        # 3. Commit (save changes) and close connection
         self.connection.commit()
         logging.info("✅ Database table 'users' is ready!")
 
@@ -68,7 +68,7 @@ class DatabaseManager:
 
 
     def get_from_cache(self,query, provider_name):
-        # תמיד מורידים הכל לאותיות קטנות כדי שלא יהיה הבדל בין Chicken ל-chicken
+        # Always convert to lowercase so there's no difference between Chicken and chicken
         query = query.lower()
         cursor = self.connection.cursor()
 
@@ -77,7 +77,7 @@ class DatabaseManager:
         row = cursor.fetchone()
 
         if row:
-            # 1. מצאנו! עכשיו מחלצים את הטקסט הארוך
+            # 1. Found! Now extract the long text
             json_string = row[0]
             saved_time_str = row[1]
             if provider_name == "edamam":
@@ -86,10 +86,10 @@ class DatabaseManager:
                     logging.info(f"⏳ Cache expired for Edamam query: {query}. Fetching fresh data!")
                     return None
 
-            # 2. הופכים טקסט חזרה לרשימה של "מילונים" של פייתון
+            # 2. Convert text back to a list of Python "dictionaries"
             recipes_dicts = json.loads(json_string)
 
-            # 3. הופכים כל מילון בחזרה לאובייקט Recipe היוקרתי שלנו, ומחזירים את הרשימה החדשה
+            # 3. Convert each dict back into our premium Recipe object, and return the new list
             recipes_objects = []
             for d in recipes_dicts:
                 recipes_objects.append(
@@ -98,7 +98,7 @@ class DatabaseManager:
             return recipes_objects
 
         else:
-            # לא מצאנו כלום במטמון
+            # Found nothing in cache
             return None
 
     def save_to_cache(self,query, provider_name, recipes_list):
@@ -106,19 +106,19 @@ class DatabaseManager:
         if len(recipes_list) == 0:
             logging.info(f"⚠️ No recipes to cache for {provider_name} with query '{query}'. Skipping cache save.")
             return
-        # הפעם הפעולה הפוכה: הופכים אובייקטי Recipe למילונים, ואז לטקסט ארוך
+        # This time the reverse: Convert Recipe objects to dicts, then to long text
         recipes_dicts = [r.to_dict() for r in recipes_list]
         json_string = json.dumps(recipes_dicts)
 
         cursor = self.connection.cursor()
 
-        # פקודת קסם: REPLACE אומר שאם מישהו איכשהו הכניס הערב שוב את צירוף המפתחות הזה, פשוט נדרוס את המידע הישן בחדש (נעשה לו Update) בעצם זה חוסך לנו לבדוק האם הוא כבר קיים!
+        # Magic command: REPLACE means if someone inserted this key combo again, just overwrite the old info with the new (Perform an Update). It saves us checking if it exists!
         cursor.execute("REPLACE INTO provider_cache (query, provider_name, recipes_json) VALUES (?, ?, ?)",
                            (query, provider_name, json_string))
         self.connection.commit()
 
     def __del__(self):
-        # כשהשרת יורד, פייתון תסגור את החיבור באלגנטיות
+        # When the server shuts down, Python will close the connection gracefully
         if hasattr(self, 'conn') and self.conn:
             self.conn.close()
             logging.info("🔌 Database connection closed gracefully.")
@@ -171,7 +171,7 @@ class DatabaseManager:
         try:
             cursor.execute("INSERT INTO users (username, password) VALUES (?, ?)", (username, password))
             self.connection.commit()
-            logging.info(f"✅ New user registered: {username}")
+            logging.info(f"👤 New user registered: {username}")
             return jsonify({"message": "User registered successfully!"}), 201
         except sqlite3.IntegrityError:
             logging.warning(f"⚠️ Registration failed: Username '{username}' already exists.")
@@ -182,7 +182,7 @@ class DatabaseManager:
         cursor.execute("SELECT * FROM users WHERE username = ? AND password = ?", (username, password))
         user = cursor.fetchone()
         if user:
-            logging.info(f"✅ User logged in: {username}")
+            logging.info(f"👤 User logged in: {username}")
             return jsonify({"message": "Login successful!"}), 200
         else:
             logging.warning(f"⚠️ Login failed for username: {username}")

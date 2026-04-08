@@ -9,7 +9,7 @@ from config import PORT
 import logging
 import os
 
-# הגדרת תיקיות הפרויקט (Root Directory)
+# Project folders setup (Root Directory)
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
 app = Flask(__name__,
@@ -28,8 +28,8 @@ app.register_blueprint(vision_bp)
 # quietly set up the Root Logger. Without force=True, this command is completely ignored!
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', force=True)
 
-# משתיק רעשי רקע: מכבה את ההדפסות האוטומטיות של שרת ה-Flask (שנקרא werkzeug)
-# כדי שתראה במסך רק את הלוגים היפים שהכנת בעצמך, אלא אם יש שגיאת קריסה
+# Silences background noise: disables auto-prints from Flask server (werkzeug)
+# So you only see your own nice logs on screen, unless there's a fatal crash
 logging.getLogger('werkzeug').setLevel(logging.ERROR)
 
 @app.route('/')
@@ -37,5 +37,5 @@ def home():
     return render_template('base.html')
 
 if __name__ == '__main__':
-    db.init_db()  # וודא שהטבלה קיימת לפני שהשרת מתחיל לעבוד
+    db.init_db()  # Ensure table exists before server starts
     app.run(debug=True, host='0.0.0.0', port=PORT)

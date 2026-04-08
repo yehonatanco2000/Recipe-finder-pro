@@ -4,7 +4,7 @@ import transformers
 from transformers import pipeline, CLIPTokenizer
 from PIL import Image
 
-# 2. השתקת הלוגים: מכבה את הדפסת הטבלאות הארוכות של Hugging Face במסוף
+# 2. Silence logs: Disables printing long Hugging Face tables in terminal
 transformers.logging.set_verbosity_error()
 
 load_dotenv()
@@ -13,16 +13,16 @@ class VisionManager:
     def __init__(self):
         print("Loading Zero-Shot AI Model (CLIP)... Please wait!")
         
-        # מושכים את תצורת המודל מקובץ סביבה לפי סטנדרט אחידות הקוד
+        # Fetch model config from environment file per standard code uniformity
         model_name = os.getenv('VISION_MODEL_NAME', 'openai/clip-vit-base-patch32')
         
-        # 1. טעינת מנתח הטקסט באופן ספציפי ופיזי (מונע משגיאת ה-AutoTokenizer לקרוס בווינדוס)
+        # 1. Load text tokenizer specifically and physically (prevents Windows AutoTokenizer crash)
         safe_tokenizer = CLIPTokenizer.from_pretrained(model_name)
         
-        # 2. הזרקת המנתח הבטוח ישירות לתוך בניית הצינור
+        # 2. Inject the safe tokenizer directly into pipeline creation
         self.classifier = pipeline("zero-shot-image-classification", model=model_name, tokenizer=safe_tokenizer)
 
-        # הרשימה הגדולה אדריכלית! ~200 מצרכים שונים באנגלית יחידה (ללא משפטים) כדי שאדמם יבין.
+        # The massive architectural list! ~200 different ingredients in English singular (no sentences) so Edamam understands.
         self.fridge_ingredients = [
             # Vegetables
             "tomato", "onion", "garlic", "potato", "carrot", "bell pepper", "broccoli", 
@@ -69,10 +69,10 @@ class VisionManager:
     def identify_ingredient(self, image_path):
         img = Image.open(image_path)
         
-        # מחפש בדיוק את המילה שהכי מתאימה מתוך ה-200.
+        # Searches precisely for the most suitable word out of the 200.
         results = self.classifier(img, candidate_labels=self.fridge_ingredients)
         
-        # התוצאה חוזרת ממדורגת, אנחנו לוקחים את [0] שזה הציון הגבוה ביותר
+        # The result returns ranked, we take [0] which is the highest score
         best_match = results[0]['label']
         return best_match
 

@@ -18,5 +18,10 @@ def login():
     password = data.get('password')
     return db.login_user(username, password)
 
-
-
+@auth_bp.route('/api/logout', methods=['POST'])
+def logout():
+    import logging
+    data = request.json
+    username = data.get('username', 'Unknown')
+    logging.info(f"👤 User logged out: {username}")
+    return jsonify({"message": "Logout successful"}), 200
