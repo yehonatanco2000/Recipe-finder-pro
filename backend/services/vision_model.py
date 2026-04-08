@@ -1,7 +1,11 @@
 import os
 from dotenv import load_dotenv
+import transformers
 from transformers import pipeline, CLIPTokenizer
 from PIL import Image
+
+# 2. השתקת הלוגים: מכבה את הדפסת הטבלאות הארוכות של Hugging Face במסוף
+transformers.logging.set_verbosity_error()
 
 load_dotenv()
 
