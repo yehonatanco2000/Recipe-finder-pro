@@ -17,3 +17,6 @@ __pycache__/
 # לא נהוג להעלות את הדאטה-בייס עצמו לפרויקטים, אלא לייצר קובץ ריק שמתמלא כשהאפליקציה רצה
 *.db
 backend/my_database.db
+
+# --- Private Documentation ---
+PROJECT_MASTER_DOCUMENT_*.md

@@ -508,6 +508,7 @@ body.dark-mode .modal-close-x:hover, body.dark-mode #close-sidebar:hover, body.d
 input[type="text"], input[type="password"] {
     width: 100%; padding: 15px; margin-bottom: 12px; border-radius: 10px;
     border: 1px solid rgba(0,0,0,0.1); background: rgba(0,0,0,0.03); outline: none;
+    font-size: 16px; /* TASK 4: Explicit 16px prevents iOS Safari auto-zoom bug! */
 }
 #login-btn, #register-btn, #confirm-register-btn {
     background: linear-gradient(180deg, #00c6ff 0%, #0072ff 100%);
@@ -570,4 +571,23 @@ body.dark-mode .spinner {
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+}
+
+@media (max-width: 600px) {
+    /* TASK 2: Mobile Sidebar Width & Context */
+    .sidebar {
+        width: 85vw; /* Takes up most of the screen but leaves 15vw visible */
+        top: 0; right: 0;
+        border-radius: 20px 0 0 20px; /* Curve left side, flatten right side against edge */
+        box-sizing: border-box; /* Prevent padding from stretching width beyond 85vw! */
+    }
+    
+    /* Apply shadow OVERLAY ONLY when open, otherwise it bleeds into closed state! */
+    .sidebar.open {
+        box-shadow: -100vw 0 0 rgba(0, 0, 0, 0.45);
+    }
+    
+    body.dark-mode .sidebar.open {
+        box-shadow: -100vw 0 0 rgba(0, 0, 0, 0.7);
+    }
 }
