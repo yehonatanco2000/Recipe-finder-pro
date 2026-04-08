@@ -66,13 +66,26 @@ if (elements.closeAlertBtn) {
 // ==========================================
 // חיבור פונקציות לסביבה העולמית (window)
 // הסיבה: בגלל המעבר למודולים הפונקציות לא זמינות באופן אוטומטי מה-HTML ל-JS (למשל: onclick)
-// ==========================================
+// 🧹 פונקציה מסודרת לניקוי המסך ומעבר למצב התחלתי נקי (Home State)
+function resetToHomeState() {
+    elements.resultsContainer.innerHTML = "";
+    elements.searchMessage.innerHTML = "";
+    elements.searchInput.value = "";
+    clearSearchTags();
+    renderChips([]);
+    elements.sidebar.classList.remove('open');
+    if (isLoggedIn) {
+        elements.recommendationsWrapper.style.display = 'block';
+    } else {
+        elements.recommendationsWrapper.style.display = 'none';
+    }
+}
 
 window.removeChip = function(index) {
     removeSearchTag(index);
     renderChips(searchTags);
     if (searchTags.length === 0) {
-        elements.homeBtn.click(); // מדמה לחיצה על כפתור הבית כדי לנקות את המסך
+        resetToHomeState();
     }
 };
 
@@ -145,18 +158,7 @@ elements.menuButton.addEventListener('click', () => elements.sidebar.classList.a
 elements.closeButton.addEventListener('click', () => elements.sidebar.classList.remove('open'));
 
 // כפתור "בית" - מחזיר אותנו למצב נקי בלי לרענן את הדף
-elements.homeBtn.addEventListener('click', () => {
-    elements.resultsContainer.innerHTML = "";
-    elements.searchMessage.innerHTML = "";
-    elements.searchInput.value = "";
-    clearSearchTags(); // מנקה את רשימת התגיות ב-auth.js
-    renderChips([]);   // מנקה את התצוגה של התגיות במסך
-    elements.sidebar.classList.remove('open');
-    // אם המשתמש מחובר, נשארים עם ההמלצות שלו
-    if (isLoggedIn) {
-        elements.recommendationsWrapper.style.display = 'block';
-    }
-});
+elements.homeBtn.addEventListener('click', resetToHomeState);
 
 
 elements.openLoginHomeBtn.addEventListener('click', () => {
@@ -211,6 +213,10 @@ elements.loginBtn.addEventListener('click', async () => {
     if (username === "") return alert("Please enter a username.");
     if (password === "") return alert("Please enter a password.");
 
+    const originalBtnText = elements.loginBtn.innerText;
+    elements.loginBtn.innerHTML = "<div class='spinner' style='width: 20px; height: 20px; border-width: 3px; margin: 0 auto; border-top-color: white;'></div>";
+    elements.loginBtn.style.pointerEvents = 'none';
+
     try {
         const response = await loginUser(username, password);
         const data = await response.json();
@@ -224,9 +230,12 @@ elements.loginBtn.addEventListener('click', async () => {
             const favData = await fetchWithDynamicRetry(() => fetchFavorites(username), elements.resultsContainer); 
             
             if (favData && Array.isArray(favData)) {
-                updateSavedRecipes(favData.map(fav => fav.recipe_id));
+                updateSavedRecipes(favData.map(fav => fav.id));
             }
             
+            // החזרת הכפתור למצבו המקורי רק לאחר שכל נתוני הרקע נטענו (המועדפים)
+            elements.loginBtn.innerHTML = originalBtnText;
+            elements.loginBtn.style.pointerEvents = 'auto';
 
             elements.openLoginHomeBtn.style.display = "none";
             elements.userGreeting.innerText = `Hello ${currentUser} 👋`;
@@ -240,9 +249,13 @@ elements.loginBtn.addEventListener('click', async () => {
             alert('Login successful! Welcome back.');
             loadRecommendations();
         } else {
+            elements.loginBtn.innerHTML = originalBtnText;
+            elements.loginBtn.style.pointerEvents = 'auto';
             alert("Login failed: " + data.error);
         }
     } catch (error) {
+        elements.loginBtn.innerHTML = "Login"; // Fallback if variable out of scope
+        elements.loginBtn.style.pointerEvents = 'auto';
         console.error("Error during login:", error);
         alert("Could not connect to the server.");
     }
@@ -338,6 +351,7 @@ elements.searchButton.addEventListener('click', async () => {
     elements.sidebar.classList.remove('open');
     elements.resultsContainer.innerHTML = "";
     elements.searchMessage.innerHTML = "<p>Loading recipes... ⏳</p>";
+    elements.recommendationsWrapper.style.display = 'none'; // מיד כשלוחצים חיפוש, מנקים המלצות מהמסך
     let cuisine = elements.cuisineSelect.value;
 
     // מפעילים את כלי העזר הכללי שלנו! שולחים לו מה לעשות (החיפוש) ואיפה לגרף הודעות
@@ -359,7 +373,8 @@ elements.searchButton.addEventListener('click', async () => {
 
     recipesList.forEach(item => {
         const recipeData = item;
-        const isSaved = savedRecipeIds.includes(recipeData.id);
+        // ממיר גם את מזהי המועדפים וגם את מזהה המתכון למחרוזות כדי למנוע פערי סוג נתונים עקב ספקי API שונים
+        const isSaved = savedRecipeIds.some(savedId => String(savedId).trim() === String(recipeData.id).trim());
         elements.resultsContainer.innerHTML += createRecipeCardHTML(recipeData, isSaved, 'search');
     });
 });
@@ -371,8 +386,10 @@ elements.themeToggle.addEventListener('click', () => {
     // 2. עדכון חזותי קטן לכפתור - אם הוא דלוק המילה משנה לשמש, אחרת מדליקה ירח!
     if (document.body.classList.contains('dark-mode')) {
         elements.themeToggle.innerText = '☀️ Light Mode';
+        localStorage.setItem('darkMode', 'enabled');
     } else {
         elements.themeToggle.innerText = '🌙 Dark Mode';
+        localStorage.setItem('darkMode', 'disabled');
     }
 });
 
@@ -446,12 +463,18 @@ async function loadRecommendations() {
 
     elements.recommendationsGrid.innerHTML = "";
     data.forEach(recipeData => {
-        const isSaved = savedRecipeIds.includes(recipeData.id); 
+        const isSaved = savedRecipeIds.some(savedId => String(savedId).trim() === String(recipeData.id).trim()); 
         elements.recommendationsGrid.innerHTML += createRecipeCardHTML(recipeData, isSaved, 'recommendation');
     });
     console.log("Recommended recipes loaded securely.");
 }
 
+
+// שחזור מצב תצוגה (לילה/יום)
+if (localStorage.getItem('darkMode') === 'enabled') {
+    document.body.classList.add('dark-mode');
+    elements.themeToggle.innerText = '☀️ Light Mode';
+}
 
 // שחזור משתמש מהכספת בטעינת העמוד (אם כבר התחברנו בעבר)
 const userFromStorage = localStorage.getItem('savedUser');
@@ -469,7 +492,7 @@ if (userFromStorage) {
     fetchFavorites(currentUser)
         .then(res => res.json())
         .then(data => {
-            updateSavedRecipes(data.map(fav => fav.recipe_id));
+            updateSavedRecipes(data.map(fav => fav.id));
         })
         .catch(err => console.error("Could not fetch favorites on load", err));
 }
