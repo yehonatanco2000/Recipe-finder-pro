@@ -74,7 +74,7 @@ function resetToHomeState() {
     clearSearchTags();
     renderChips([]);
     elements.sidebar.classList.remove('open');
-    if (isLoggedIn) {
+    if (isLoggedIn && savedRecipeIds.length > 0) {
         elements.recommendationsWrapper.style.display = 'block';
     } else {
         elements.recommendationsWrapper.style.display = 'none';
@@ -194,7 +194,7 @@ elements.logoutBtn.addEventListener('click', () => {
         document.body.classList.remove('logged-in'); // חזרה למצב ללא תוצאות/המלצות
         elements.logoutBtn.style.display = "none";
         elements.userGreeting.style.display = "none";
-        elements.favoritesBtn.style.display = "none";
+        elements.favoritesBtn.style.display = "block";
         elements.openLoginHomeBtn.style.display = "block";
         elements.resultsContainer.innerHTML = "";
         elements.searchMessage.innerHTML = "";
@@ -379,16 +379,12 @@ elements.searchButton.addEventListener('click', async () => {
     });
 });
 
-elements.themeToggle.addEventListener('click', () => {
-    // 1. הוספה והסרה אוטומטית של המחלקה 'dark-mode' מכל הגוף של האתר
-    document.body.classList.toggle('dark-mode');
-
-    // 2. עדכון חזותי קטן לכפתור - אם הוא דלוק המילה משנה לשמש, אחרת מדליקה ירח!
-    if (document.body.classList.contains('dark-mode')) {
-        elements.themeToggle.innerText = '☀️ Light Mode';
+elements.themeToggle.addEventListener('change', () => {
+    if (elements.themeToggle.checked) {
+        document.body.classList.add('dark-mode');
         localStorage.setItem('darkMode', 'enabled');
     } else {
-        elements.themeToggle.innerText = '🌙 Dark Mode';
+        document.body.classList.remove('dark-mode');
         localStorage.setItem('darkMode', 'disabled');
     }
 });
@@ -433,6 +429,12 @@ elements.cameraInput.addEventListener('change', async (event) => {
 async function loadRecommendations() {
     if (!currentUser) return;
     
+    // אם אין מועדפים, נעלים מייד את הבלוק ולא נעשה כלום
+    if (savedRecipeIds.length === 0) {
+        elements.recommendationsWrapper.style.display = 'none';
+        return;
+    }
+
     // אנו מציגים את הקובייה לפני שיש תוכן רק בתנאי שאין חיפוש באמצע המסך,
     // ומדפיסים הודעה שיודעת לתת לחיווי (פדרג/המתנה)
     if (elements.resultsContainer.innerHTML.trim() === "") {
@@ -450,13 +452,7 @@ async function loadRecommendations() {
     if (!data) return; // השעון או השגיאה כבר הודפסו בגריד על ידי הסוכן
     
     // אם זו שגיאה טבעית של "משתמש חדש בלי מועדפים", נעלים את הקובייה לחלוטין כמו פעם ונסיים
-    if (data.error) {
-        elements.recommendationsWrapper.style.display = 'none';
-        return;
-    }
-
-    // אם הכל עבר חלק, נצייר (רק אם יש לפחות המלצה אחת שהגיעה מהעדפות)
-    if (!data || data.length === 0) {
+    if (data.error || data.length === 0) {
         elements.recommendationsWrapper.style.display = 'none';
         return;
     }
@@ -473,7 +469,9 @@ async function loadRecommendations() {
 // שחזור מצב תצוגה (לילה/יום)
 if (localStorage.getItem('darkMode') === 'enabled') {
     document.body.classList.add('dark-mode');
-    elements.themeToggle.innerText = '☀️ Light Mode';
+    elements.themeToggle.checked = true;
+} else {
+    elements.themeToggle.checked = false;
 }
 
 // שחזור משתמש מהכספת בטעינת העמוד (אם כבר התחברנו בעבר)
@@ -492,11 +490,11 @@ if (userFromStorage) {
     fetchFavorites(currentUser)
         .then(res => res.json())
         .then(data => {
-            updateSavedRecipes(data.map(fav => fav.id));
+            if (data && Array.isArray(data)) {
+                updateSavedRecipes(data.map(fav => fav.id));
+            }
+            // אחרי שרשימת המועדפים עודכנה בהצלחה, זה הזמן הבטוח לקרוא להמלצות
+            loadRecommendations();
         })
         .catch(err => console.error("Could not fetch favorites on load", err));
 }
-
-
-// ברגע שה-HTML נטען כראוי נפעיל את תהליך חיפוש ההמלצות
-window.addEventListener('DOMContentLoaded', loadRecommendations);

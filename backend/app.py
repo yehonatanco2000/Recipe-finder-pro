@@ -24,7 +24,9 @@ app.register_blueprint(recipe_bp)
 app.register_blueprint(recommendation_bp)
 app.register_blueprint(vision_bp)
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+# We MUST use force=True, because Flask or other libraries might have already
+# quietly set up the Root Logger. Without force=True, this command is completely ignored!
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', force=True)
 
 # משתיק רעשי רקע: מכבה את ההדפסות האוטומטיות של שרת ה-Flask (שנקרא werkzeug)
 # כדי שתראה במסך רק את הלוגים היפים שהכנת בעצמך, אלא אם יש שגיאת קריסה
