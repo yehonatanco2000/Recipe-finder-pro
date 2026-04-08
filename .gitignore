@@ -24,3 +24,4 @@ PROJECT_MASTER_DOCUMENT_*.md
 # --- Specific Ignore Files/Folders ---
 backend/scripts/
 *.mp4
+debug.json
